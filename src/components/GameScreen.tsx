@@ -4,6 +4,7 @@ import { useGameContext } from './GameContext';
 import WordChallenge from './WordChallenge';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
+import { Sparkles } from 'lucide-react';
 
 const GameScreen: React.FC = () => {
   const { 
@@ -35,7 +36,7 @@ const GameScreen: React.FC = () => {
   
   return (
     <motion.div 
-      className="min-h-screen flex flex-col items-center justify-center p-4"
+      className="min-h-screen flex flex-col items-center justify-center p-4 bg-yellow-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -47,12 +48,14 @@ const GameScreen: React.FC = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <div className="px-4 py-3 bg-primary/10 border-b flex justify-between items-center">
-          <div className="text-sm font-medium">
-            Runda: <span className="font-bold">{currentRound + 1}</span> / {totalRounds}
+        <div className="px-4 py-3 bg-primary/20 border-b flex justify-between items-center">
+          <div className="text-sm font-medium flex items-center">
+            <Sparkles className="w-4 h-4 mr-1 text-primary" />
+            Runda: <span className="font-bold ml-1">{currentRound + 1}</span> / {totalRounds}
           </div>
-          <div className="text-sm font-medium">
-            Punkty: <span className="font-bold">{score}</span>
+          <div className="text-sm font-medium flex items-center">
+            Punkty: <span className="font-bold ml-1">{score}</span>
+            <Sparkles className="w-4 h-4 ml-1 text-primary" />
           </div>
         </div>
         
@@ -71,7 +74,7 @@ const GameScreen: React.FC = () => {
             >
               <Button 
                 onClick={handleNext}
-                className="px-8 py-2 text-lg"
+                className="px-8 py-2 text-lg bg-primary hover:bg-primary/90"
                 size="lg"
               >
                 Dalej

@@ -2,13 +2,14 @@
 import React from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 const StartScreen: React.FC = () => {
   const { resetGame } = useGameContext();
   
   return (
     <motion.div 
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-yellow-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -19,8 +20,18 @@ const StartScreen: React.FC = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
+        <motion.div
+          className="flex items-center justify-center mb-4"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <Sparkles className="w-8 h-8 text-primary mr-2" />
+          <Sparkles className="w-6 h-6 text-primary" />
+        </motion.div>
+        
         <motion.h1 
-          className="text-3xl md:text-4xl font-bold mb-2"
+          className="text-3xl md:text-4xl font-bold mb-2 text-primary-foreground"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
@@ -29,7 +40,7 @@ const StartScreen: React.FC = () => {
         </motion.h1>
         
         <motion.div 
-          className="text-xl text-primary/80 mb-6"
+          className="text-xl text-primary mb-6"
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
@@ -47,7 +58,7 @@ const StartScreen: React.FC = () => {
         </motion.p>
         
         <motion.button
-          className="bg-primary text-white text-lg md:text-xl px-10 py-4 rounded-full shadow-lg button-hover animate-pulse-scale"
+          className="bg-primary text-primary-foreground text-lg md:text-xl px-10 py-4 rounded-full shadow-lg button-hover animate-pulse-scale"
           onClick={resetGame}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Challenge, useGameContext } from './GameContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,6 +12,12 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) =>
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const { playSound } = useGameContext();
+  
+  // Reset state when challenge changes
+  useEffect(() => {
+    setSelectedOption(null);
+    setShowResult(false);
+  }, [challenge]);
   
   const handleOptionSelect = (option: string) => {
     if (showResult) return; // Prevent multiple selections
@@ -45,10 +51,11 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) =>
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
+      key={challenge.id} // Add key to force re-render when challenge changes
     >
       <div className="mb-8 text-center">
         <motion.div 
-          className="text-2xl md:text-3xl mb-2 font-medium"
+          className="text-2xl md:text-3xl mb-2 font-medium text-primary-foreground"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
