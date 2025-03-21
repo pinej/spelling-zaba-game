@@ -11,7 +11,7 @@ type WordChallengeProps = {
 const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const { playSound } = useGameContext();
+  const { playSound, addIncorrectAnswer } = useGameContext();
   
   // Reset state when challenge changes
   useEffect(() => {
@@ -31,6 +31,7 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) =>
       playSound('correct');
     } else {
       playSound('incorrect');
+      addIncorrectAnswer(challenge);
     }
     
     setShowResult(true);

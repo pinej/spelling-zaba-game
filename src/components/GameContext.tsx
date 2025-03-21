@@ -24,6 +24,8 @@ type GameContextType = {
   resetGame: () => void;
   goToNextChallenge: () => void;
   playSound: (type: 'correct' | 'incorrect' | 'start' | 'end') => void;
+  incorrectAnswers: Challenge[];
+  addIncorrectAnswer: (challenge: Challenge) => void;
 };
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -45,6 +47,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [score, setScore] = useState(0);
   const [currentRound, setCurrentRound] = useState(0);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [incorrectAnswers, setIncorrectAnswers] = useState<Challenge[]>([]);
   const [sounds, setSounds] = useState<Record<string, HTMLAudioElement | null>>({
     correct: null,
     incorrect: null,
@@ -97,12 +100,17 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setScore(0);
     setCurrentRound(0);
     setChallenges(generateChallenges());
+    setIncorrectAnswers([]);
     setGameStatus('playing');
     playSound('start');
   };
 
   const incrementScore = () => {
     setScore(prev => prev + 1);
+  };
+
+  const addIncorrectAnswer = (challenge: Challenge) => {
+    setIncorrectAnswers(prev => [...prev, challenge]);
   };
 
   const goToNextChallenge = () => {
@@ -134,7 +142,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     totalRounds,
     resetGame,
     goToNextChallenge,
-    playSound
+    playSound,
+    incorrectAnswers,
+    addIncorrectAnswer
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
