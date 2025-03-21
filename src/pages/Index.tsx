@@ -6,12 +6,12 @@ import GameScreen from '../components/GameScreen';
 import EndScreen from '../components/EndScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Sounds for the game
+// Sounds for the game with WAV extension
 const soundFiles = [
-  '/correct.mp3',
-  '/incorrect.mp3',
-  '/start.mp3',
-  '/end.mp3'
+  '/correct.wav',
+  '/incorrect.wav',
+  '/start.wav',
+  '/end.wav'
 ];
 
 const GameContent: React.FC = () => {

@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from 'react';
 
-// Define sound file paths with correct path references
+// Define sound file paths with correct path references and WAV extension
 const SOUND_PATHS = {
-  correct: '/correct.mp3',
-  incorrect: '/incorrect.mp3',
-  start: '/start.mp3',
-  end: '/end.mp3'
+  correct: '/correct.wav',
+  incorrect: '/incorrect.wav',
+  start: '/start.wav',
+  end: '/end.wav'
 };
 
 type SoundType = 'correct' | 'incorrect' | 'start' | 'end';
