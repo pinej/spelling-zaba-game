@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Challenge, useGameContext } from './GameContext';
+import { useGameContext } from './GameContext';
+import { Challenge } from '../types/game';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type WordChallengeProps = {
