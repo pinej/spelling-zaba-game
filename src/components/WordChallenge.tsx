@@ -23,16 +23,17 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) =>
     if (showResult) return; // Prevent multiple selections
     
     setSelectedOption(option);
-    setShowResult(true);
     
     const isCorrect = option === challenge.correctOption;
     
+    // Play the sound immediately when the option is selected
     if (isCorrect) {
       playSound('correct');
     } else {
       playSound('incorrect');
     }
     
+    setShowResult(true);
     onAnswer(isCorrect);
   };
   
