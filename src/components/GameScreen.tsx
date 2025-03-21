@@ -4,7 +4,8 @@ import { useGameContext } from './GameContext';
 import WordChallenge from './WordChallenge';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { Toggle } from './ui/toggle';
 
 const GameScreen: React.FC = () => {
   const { 
@@ -13,7 +14,11 @@ const GameScreen: React.FC = () => {
     currentRound, 
     totalRounds, 
     currentChallenge, 
-    goToNextChallenge 
+    goToNextChallenge,
+    soundsEnabled,
+    enableSounds,
+    toggleMute,
+    isMuted
   } = useGameContext();
   
   const [showNextButton, setShowNextButton] = useState(false);
@@ -53,13 +58,46 @@ const GameScreen: React.FC = () => {
             <Sparkles className="w-4 h-4 mr-1 text-primary" />
             Runda: <span className="font-bold ml-1">{currentRound + 1}</span> / {totalRounds}
           </div>
-          <div className="text-sm font-medium flex items-center">
-            Punkty: <span className="font-bold ml-1">{score}</span>
-            <Sparkles className="w-4 h-4 ml-1 text-primary" />
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-medium flex items-center">
+              Punkty: <span className="font-bold ml-1">{score}</span>
+              <Sparkles className="w-4 h-4 ml-1 text-primary" />
+            </div>
+            
+            {/* Sound controls */}
+            {soundsEnabled ? (
+              <Toggle 
+                pressed={!isMuted} 
+                onPressedChange={() => toggleMute()} 
+                aria-label={isMuted ? "Włącz dźwięk" : "Wycisz dźwięk"}
+                className="ml-2"
+              >
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </Toggle>
+            ) : null}
           </div>
         </div>
         
         <div className="p-6">
+          {!soundsEnabled && (
+            <motion.div 
+              className="mb-4 p-2 bg-yellow-100 rounded-md flex items-center justify-center gap-2"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={enableSounds}
+                className="flex items-center gap-2"
+              >
+                <Volume2 size={16} />
+                Włącz dźwięki
+              </Button>
+            </motion.div>
+          )}
+          
           <WordChallenge 
             challenge={currentChallenge} 
             onAnswer={handleAnswer} 

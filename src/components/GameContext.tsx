@@ -19,6 +19,8 @@ type GameContextType = {
   addIncorrectAnswer: (challenge: Challenge) => void;
   soundsEnabled: boolean;
   enableSounds: () => void;
+  isMuted: boolean;
+  toggleMute: () => void;
 };
 
 const GameContext = createContext<GameContextType | null>(null);

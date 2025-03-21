@@ -10,7 +10,7 @@ export function useGameState() {
   const [currentRound, setCurrentRound] = useState(0);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [incorrectAnswers, setIncorrectAnswers] = useState<Challenge[]>([]);
-  const { playSound, soundsEnabled, enableSounds } = useAudio();
+  const { playSound, soundsEnabled, enableSounds, isMuted, toggleMute } = useAudio();
   
   const totalRounds = 10;
 
@@ -64,6 +64,8 @@ export function useGameState() {
     incorrectAnswers,
     addIncorrectAnswer,
     soundsEnabled,
-    enableSounds
+    enableSounds,
+    isMuted,
+    toggleMute
   };
 }

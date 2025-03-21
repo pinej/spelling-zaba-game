@@ -19,7 +19,20 @@ export function useAudio() {
     end: null,
   });
   const [soundsEnabled, setSoundsEnabled] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+
+  // Toggle mute state
+  const toggleMute = () => {
+    setIsMuted(prev => !prev);
+    
+    // Update all audio elements
+    Object.values(sounds).forEach(sound => {
+      if (sound) {
+        sound.muted = !isMuted;
+      }
+    });
+  };
 
   // Initialize AudioContext on first user interaction
   const enableSounds = () => {
@@ -53,7 +66,7 @@ export function useAudio() {
     // Set up all audio elements
     Object.entries(audioElements).forEach(([type, audio]) => {
       audio.volume = 1.0;
-      audio.muted = false;
+      audio.muted = isMuted;
       audio.preload = 'auto';
       
       // Log success or failure
@@ -163,6 +176,12 @@ export function useAudio() {
       return;
     }
     
+    // Don't try to play sounds if muted
+    if (isMuted) {
+      console.log(`Sound ${type} not played because audio is muted`);
+      return;
+    }
+    
     const sound = sounds[type];
     if (!sound) {
       console.warn(`Sound not loaded for type: ${type}`);
@@ -208,6 +227,8 @@ export function useAudio() {
   return {
     playSound,
     soundsEnabled,
-    enableSounds
+    enableSounds,
+    isMuted,
+    toggleMute
   };
 }
