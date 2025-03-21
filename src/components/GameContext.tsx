@@ -25,6 +25,8 @@ type GameContextType = {
   playSound: (type: 'correct' | 'incorrect' | 'start' | 'end') => void;
   incorrectAnswers: Challenge[];
   addIncorrectAnswer: (challenge: Challenge) => void;
+  soundsEnabled: boolean;
+  enableSounds: () => void;
 };
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -41,12 +43,12 @@ type GameProviderProps = {
   children: ReactNode;
 };
 
-// Define sound file paths with proper references
+// Define sound file paths - ensure absolute paths
 const SOUND_PATHS = {
-  correct: process.env.PUBLIC_URL + '/correct.mp3',
-  incorrect: process.env.PUBLIC_URL + '/incorrect.mp3',
-  start: process.env.PUBLIC_URL + '/start.mp3',
-  end: process.env.PUBLIC_URL + '/end.mp3'
+  correct: '/correct.mp3',
+  incorrect: '/incorrect.mp3',
+  start: '/start.mp3',
+  end: '/end.mp3'
 };
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
@@ -61,77 +63,133 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     start: null,
     end: null,
   });
-  const [audioInitialized, setAudioInitialized] = useState(false);
+  const [soundsEnabled, setSoundsEnabled] = useState(false);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   
   const totalRounds = 10;
 
-  // Create and enable audio only after user interaction
-  useEffect(() => {
-    // Create a user interaction handler to enable audio
-    const enableAudio = () => {
-      console.log("User interaction detected - enabling audio");
+  // Initialize AudioContext on first user interaction
+  const enableSounds = () => {
+    if (soundsEnabled) return; // Skip if already enabled
+    
+    console.log("Enabling sounds via user interaction");
+    
+    // Create AudioContext
+    try {
+      const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (context.state === 'suspended') {
+        context.resume().then(() => {
+          console.log("AudioContext resumed successfully");
+        }).catch(err => {
+          console.error("Failed to resume AudioContext:", err);
+        });
+      }
+      setAudioContext(context);
+    } catch (e) {
+      console.error("Error creating AudioContext:", e);
+    }
+    
+    // Create and preload audio elements
+    const audioElements: Record<string, HTMLAudioElement> = {
+      correct: new Audio(SOUND_PATHS.correct),
+      incorrect: new Audio(SOUND_PATHS.incorrect),
+      start: new Audio(SOUND_PATHS.start),
+      end: new Audio(SOUND_PATHS.end)
+    };
+    
+    // Set up all audio elements
+    Object.entries(audioElements).forEach(([type, audio]) => {
+      audio.volume = 1.0;
+      audio.muted = false;
+      audio.preload = 'auto';
       
-      const audioElements: Record<string, HTMLAudioElement> = {
-        correct: new Audio(SOUND_PATHS.correct),
-        incorrect: new Audio(SOUND_PATHS.incorrect),
-        start: new Audio(SOUND_PATHS.start),
-        end: new Audio(SOUND_PATHS.end)
-      };
+      // Log success or failure
+      audio.addEventListener('canplaythrough', () => {
+        console.log(`Sound loaded successfully: ${type}`);
+      });
       
-      // Set volume and preload for all sounds
-      Object.values(audioElements).forEach(audio => {
-        audio.volume = 1.0;
-        audio.muted = false;
-        audio.preload = 'auto';
-        
-        // Force a load attempt
-        audio.load();
-        
-        // Add event listeners to verify loading
-        audio.addEventListener('canplaythrough', () => {
-          console.log(`Sound loaded: ${audio.src}`);
-        });
-        
-        audio.addEventListener('error', (e) => {
-          console.error(`Error loading sound: ${audio.src}`, e);
-        });
-        
-        // Test playback and immediately pause (to enable audio context)
-        const testPlay = audio.play().catch(err => {
-          console.warn("Initial audio test play failed:", err.message);
-        });
-        
-        if (testPlay !== undefined) {
-          testPlay.then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-            console.log(`Audio successfully initialized: ${audio.src}`);
-          });
+      audio.addEventListener('error', (e) => {
+        // Check if the error is a 404
+        if ((e.target as HTMLAudioElement).error?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+          console.error(`Sound file not found or not supported: ${type} (${audio.src})`);
+        } else {
+          console.error(`Error loading sound: ${type}`, (e.target as HTMLAudioElement).error);
         }
       });
       
-      setSounds(audioElements);
-      setAudioInitialized(true);
+      // Force loading
+      audio.load();
       
-      // Remove the event listeners once audio is enabled
-      window.removeEventListener('click', enableAudio);
-      window.removeEventListener('touchstart', enableAudio);
-      document.removeEventListener('click', enableAudio);
-      document.removeEventListener('touchstart', enableAudio);
+      // Test play (and immediately pause) to prime the audio system
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        console.log(`Sound initialized: ${type}`);
+      }).catch(err => {
+        console.warn(`Couldn't initialize sound ${type}:`, err.message);
+      });
+    });
+    
+    setSounds(audioElements);
+    setSoundsEnabled(true);
+    
+    // Play a test sound after a short delay to verify sounds are working
+    setTimeout(() => {
+      const testSound = audioElements.start;
+      if (testSound) {
+        testSound.currentTime = 0;
+        testSound.play().then(() => {
+          console.log("Test sound played successfully");
+        }).catch(err => {
+          console.error("Test sound failed:", err.message);
+        });
+      }
+    }, 500);
+  };
+
+  // Set up event listeners for enabling audio on any user interaction
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (!soundsEnabled) {
+        enableSounds();
+      }
     };
     
-    // Add event listeners for user interaction
-    window.addEventListener('click', enableAudio);
-    window.addEventListener('touchstart', enableAudio);
-    document.addEventListener('click', enableAudio);
-    document.addEventListener('touchstart', enableAudio);
+    // Add various interaction listeners
+    window.addEventListener('click', handleUserInteraction);
+    window.addEventListener('touchstart', handleUserInteraction);
+    window.addEventListener('keydown', handleUserInteraction);
+    
+    // Check if audio files exist
+    const checkAudioFiles = async () => {
+      for (const [type, path] of Object.entries(SOUND_PATHS)) {
+        try {
+          const response = await fetch(path, { method: 'HEAD' });
+          if (!response.ok) {
+            console.error(`Sound file not found: ${type} (${path})`);
+          } else {
+            console.log(`Sound file exists: ${type} (${path})`);
+          }
+        } catch (err) {
+          console.error(`Error checking sound file ${type}:`, err);
+        }
+      }
+    };
+    
+    checkAudioFiles();
     
     return () => {
       // Clean up event listeners
-      window.removeEventListener('click', enableAudio);
-      window.removeEventListener('touchstart', enableAudio);
-      document.removeEventListener('click', enableAudio);
-      document.removeEventListener('touchstart', enableAudio);
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
+      
+      // Clean up audio context
+      if (audioContext) {
+        audioContext.close().catch(err => {
+          console.error("Error closing AudioContext:", err);
+        });
+      }
       
       // Clean up audio elements
       Object.values(sounds).forEach(sound => {
@@ -141,57 +199,53 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         }
       });
     };
-  }, []);
+  }, [soundsEnabled, audioContext]);
 
   const playSound = (type: 'correct' | 'incorrect' | 'start' | 'end') => {
-    const sound = sounds[type];
+    // If sounds aren't enabled yet, try to enable them
+    if (!soundsEnabled) {
+      console.log("Sounds not enabled yet, attempting to enable...");
+      enableSounds();
+      // Early return - the next sound play attempt will work after initialization
+      return;
+    }
     
+    const sound = sounds[type];
     if (!sound) {
       console.warn(`Sound not loaded for type: ${type}`);
       return;
     }
     
-    console.log(`Attempting to play sound: ${type} from ${sound.src}`);
+    console.log(`Playing sound: ${type} from ${sound.src}`);
     
     // Reset to beginning and ensure volume is up
     sound.currentTime = 0;
     sound.volume = 1.0;
     sound.muted = false;
     
+    // Resume AudioContext if it exists and is suspended
+    if (audioContext && audioContext.state === 'suspended') {
+      audioContext.resume().catch(err => {
+        console.error("Failed to resume AudioContext:", err);
+      });
+    }
+    
+    // Play the sound with better error handling
     try {
-      // Create a new AudioContext to help with browser policies
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioContextClass) {
-        const audioContext = new AudioContextClass();
-        if (audioContext.state === 'suspended') {
-          audioContext.resume();
-        }
-      }
-      
       const playPromise = sound.play();
       
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log(`Sound playing successfully: ${type}`);
-          })
-          .catch(e => {
-            console.error(`Error playing sound: ${e.message}`);
+        playPromise.catch(e => {
+          console.error(`Error playing sound ${type}:`, e.message);
+          
+          // If there's an autoplay policy issue, show a message or UI element
+          if (e.name === 'NotAllowedError') {
+            console.warn("Autoplay policy prevented sound from playing - user interaction required");
             
-            // If there's an autoplay policy issue, attach a temporary click handler
-            if (e.name === 'NotAllowedError') {
-              console.log("Creating temporary click handler to enable audio");
-              
-              const tempHandler = () => {
-                sound.play().catch(err => console.error("Still could not play sound:", err));
-                document.removeEventListener('click', tempHandler);
-                document.removeEventListener('touchstart', tempHandler);
-              };
-              
-              document.addEventListener('click', tempHandler);
-              document.addEventListener('touchstart', tempHandler);
-            }
-          });
+            // Attempt to re-enable sounds
+            setSoundsEnabled(false);
+          }
+        });
       }
     } catch (e) {
       console.error('Critical error playing sound:', e);
@@ -246,7 +300,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     goToNextChallenge,
     playSound,
     incorrectAnswers,
-    addIncorrectAnswer
+    addIncorrectAnswer,
+    soundsEnabled,
+    enableSounds
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
