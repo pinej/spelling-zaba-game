@@ -1,7 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { generateChallenges } from '../utils/gameUtils';
-import { useAudio } from '../hooks/useAudio';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useGameState } from '../hooks/useGameState';
 import { GameStatus, Challenge } from '../types/game';
 
 type GameContextType = {
@@ -37,67 +36,8 @@ type GameProviderProps = {
 };
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-  const [gameStatus, setGameStatus] = useState<GameStatus>('start');
-  const [score, setScore] = useState(0);
-  const [currentRound, setCurrentRound] = useState(0);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [incorrectAnswers, setIncorrectAnswers] = useState<Challenge[]>([]);
-  const { playSound, soundsEnabled, enableSounds } = useAudio();
-  
-  const totalRounds = 10;
+  // Use our custom hook for game state management
+  const gameState = useGameState();
 
-  const resetGame = () => {
-    setScore(0);
-    setCurrentRound(0);
-    setChallenges(generateChallenges());
-    setIncorrectAnswers([]);
-    setGameStatus('playing');
-    playSound('start');
-  };
-
-  const incrementScore = () => {
-    setScore(prev => prev + 1);
-  };
-
-  const addIncorrectAnswer = (challenge: Challenge) => {
-    setIncorrectAnswers(prev => [...prev, challenge]);
-  };
-
-  const goToNextChallenge = () => {
-    if (currentRound + 1 >= totalRounds) {
-      setGameStatus('end');
-      playSound('end');
-    } else {
-      setCurrentRound(prev => prev + 1);
-    }
-  };
-
-  useEffect(() => {
-    if (gameStatus === 'playing' && challenges.length === 0) {
-      setChallenges(generateChallenges());
-    }
-  }, [gameStatus]);
-
-  // Get current challenge
-  const currentChallenge = challenges[currentRound] || null;
-
-  const value = {
-    gameStatus,
-    setGameStatus,
-    score,
-    incrementScore,
-    currentRound,
-    challenges,
-    currentChallenge,
-    totalRounds,
-    resetGame,
-    goToNextChallenge,
-    playSound,
-    incorrectAnswers,
-    addIncorrectAnswer,
-    soundsEnabled,
-    enableSounds
-  };
-
-  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
+  return <GameContext.Provider value={gameState}>{children}</GameContext.Provider>;
 };
