@@ -1,12 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
 import { Sparkles, Volume2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 const StartScreen: React.FC = () => {
-  const { resetGame, soundsEnabled, enableSounds } = useGameContext();
+  const { resetGame, soundsEnabled, enableSounds, setPlayerName, playerName } = useGameContext();
+  const [nameInput, setNameInput] = useState(playerName || '');
+  
+  const handleStartGame = () => {
+    setPlayerName(nameInput.trim());
+    resetGame();
+  };
   
   return (
     <motion.div 
@@ -50,7 +57,7 @@ const StartScreen: React.FC = () => {
         </motion.div>
         
         <motion.p 
-          className="mb-8 text-muted-foreground"
+          className="mb-6 text-muted-foreground"
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
@@ -58,12 +65,28 @@ const StartScreen: React.FC = () => {
           Wybierz poprawną literę w każdym słowie i zdobądź punkty!
         </motion.p>
         
+        <motion.div
+          className="w-full max-w-xs mb-6"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+        >
+          <label className="block text-sm font-medium text-left mb-1">Twoje imię:</label>
+          <Input
+            type="text"
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            placeholder="Wpisz swoje imię"
+            className="mb-2"
+          />
+        </motion.div>
+        
         {!soundsEnabled && (
           <motion.div
             className="mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.5 }}
+            transition={{ delay: 1.0, duration: 0.5 }}
           >
             <Button 
               variant="outline"
@@ -79,12 +102,12 @@ const StartScreen: React.FC = () => {
         
         <motion.button
           className="bg-primary text-primary-foreground text-lg md:text-xl px-10 py-4 rounded-full shadow-lg button-hover animate-pulse-scale"
-          onClick={resetGame}
+          onClick={handleStartGame}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1.0, duration: 0.5 }}
+          transition={{ delay: 1.1, duration: 0.5 }}
         >
           START
         </motion.button>

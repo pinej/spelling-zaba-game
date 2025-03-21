@@ -21,6 +21,8 @@ type GameContextType = {
   enableSounds: () => void;
   isMuted: boolean;
   toggleMute: () => void;
+  playerName: string;
+  setPlayerName: (name: string) => void;
 };
 
 const GameContext = createContext<GameContextType | null>(null);

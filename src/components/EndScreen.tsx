@@ -3,17 +3,28 @@ import React from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Home } from 'lucide-react';
+import { Button } from './ui/button';
 
 const EndScreen: React.FC = () => {
-  const { score, totalRounds, resetGame, setGameStatus, incorrectAnswers } = useGameContext();
+  const { 
+    score, 
+    totalRounds, 
+    resetGame, 
+    setGameStatus, 
+    incorrectAnswers, 
+    playerName 
+  } = useGameContext();
   
   const scorePercentage = (score / totalRounds) * 100;
   
   const getFeedback = () => {
-    if (scorePercentage >= 90) return "Wspaniale! Jesteś mistrzem ortografii!";
-    if (scorePercentage >= 70) return "Bardzo dobrze! Prawie wszystko umiesz!";
-    if (scorePercentage >= 50) return "Dobrze! Ale warto jeszcze poćwiczyć.";
-    return "Spróbuj jeszcze raz, na pewno się uda!";
+    const playerNamePrefix = playerName ? `${playerName}, ` : '';
+    
+    if (scorePercentage >= 90) return `${playerNamePrefix}wspaniale! Jesteś mistrzem ortografii!`;
+    if (scorePercentage >= 70) return `${playerNamePrefix}bardzo dobrze! Prawie wszystko umiesz!`;
+    if (scorePercentage >= 50) return `${playerNamePrefix}dobrze! Ale warto jeszcze poćwiczyć.`;
+    return `${playerNamePrefix}spróbuj jeszcze raz, na pewno się uda!`;
   };
   
   const hasIncorrectAnswers = incorrectAnswers.length > 0;
@@ -26,6 +37,18 @@ const EndScreen: React.FC = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
+      <div className="absolute top-4 left-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setGameStatus('start')}
+          className="flex items-center gap-2"
+        >
+          <Home size={16} />
+          Powrót do menu
+        </Button>
+      </div>
+      
       <motion.div 
         className="glass-card max-w-lg w-full text-center p-8"
         initial={{ y: 20, opacity: 0 }}
@@ -72,7 +95,7 @@ const EndScreen: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1.0, duration: 0.5 }}
             >
-              Zapamiętaj te słowa!
+              {playerName ? `${playerName}, zapamiętaj te słowa!` : 'Zapamiętaj te słowa!'}
             </motion.h3>
             
             <Table>
@@ -87,10 +110,10 @@ const EndScreen: React.FC = () => {
                   <TableRow key={index}>
                     <TableCell className="font-medium">
                       {challenge.prefix}
-                      <span className="text-primary font-bold">{challenge.correctOption}</span>
+                      <span className="text-destructive font-bold">{challenge.correctOption}</span>
                       {challenge.suffix}
                     </TableCell>
-                    <TableCell className="text-center font-bold text-primary">
+                    <TableCell className="text-center font-bold text-destructive">
                       {challenge.correctOption}
                     </TableCell>
                   </TableRow>

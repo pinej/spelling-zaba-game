@@ -4,7 +4,7 @@ import { useGameContext } from './GameContext';
 import WordChallenge from './WordChallenge';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
-import { Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, Volume2, VolumeX, Home } from 'lucide-react';
 import { Toggle } from './ui/toggle';
 
 const GameScreen: React.FC = () => {
@@ -18,7 +18,9 @@ const GameScreen: React.FC = () => {
     soundsEnabled,
     enableSounds,
     toggleMute,
-    isMuted
+    isMuted,
+    setGameStatus,
+    playerName
   } = useGameContext();
   
   const [showNextButton, setShowNextButton] = useState(false);
@@ -34,6 +36,10 @@ const GameScreen: React.FC = () => {
     setShowNextButton(false);
     goToNextChallenge();
   };
+
+  const handleReturnToMain = () => {
+    setGameStatus('start');
+  };
   
   if (!currentChallenge) {
     return <div>Loading...</div>;
@@ -47,6 +53,18 @@ const GameScreen: React.FC = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
+      <div className="absolute top-4 left-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleReturnToMain}
+          className="flex items-center gap-2"
+        >
+          <Home size={16} />
+          Powrót do menu
+        </Button>
+      </div>
+
       <motion.div 
         className="glass-card max-w-2xl w-full rounded-xl overflow-hidden shadow-lg"
         initial={{ y: 20, opacity: 0 }}
@@ -79,6 +97,12 @@ const GameScreen: React.FC = () => {
         </div>
         
         <div className="p-6">
+          {playerName && (
+            <div className="mb-2 text-center font-medium">
+              {playerName}, wybierz poprawną literę:
+            </div>
+          )}
+          
           {!soundsEnabled && (
             <motion.div 
               className="mb-4 p-2 bg-yellow-100 rounded-md flex items-center justify-center gap-2"
