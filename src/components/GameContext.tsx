@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { generateChallenges } from '../utils/gameUtils';
 
@@ -44,10 +43,10 @@ type GameProviderProps = {
 
 // Define sound file paths with proper references
 const SOUND_PATHS = {
-  correct: '/correct.mp3',
-  incorrect: '/incorrect.mp3',
-  start: '/start.mp3',
-  end: '/end.mp3'
+  correct: process.env.PUBLIC_URL + '/correct.mp3',
+  incorrect: process.env.PUBLIC_URL + '/incorrect.mp3',
+  start: process.env.PUBLIC_URL + '/start.mp3',
+  end: process.env.PUBLIC_URL + '/end.mp3'
 };
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
