@@ -42,6 +42,14 @@ type GameProviderProps = {
   children: ReactNode;
 };
 
+// Define sound file paths
+const SOUND_PATHS = {
+  correct: '/correct.mp3',
+  incorrect: '/incorrect.mp3',
+  start: '/start.mp3',
+  end: '/end.mp3'
+};
+
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameStatus, setGameStatus] = useState<GameStatus>('start');
   const [score, setScore] = useState(0);
@@ -57,33 +65,46 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   
   const totalRounds = 10;
 
-  // Initialize sounds
+  // Create and preload audio elements
   useEffect(() => {
-    const correctSound = new Audio('/correct.mp3');
-    const incorrectSound = new Audio('/incorrect.mp3');
-    const startSound = new Audio('/start.mp3');
-    const endSound = new Audio('/end.mp3');
-
-    setSounds({
-      correct: correctSound,
-      incorrect: incorrectSound,
-      start: startSound,
-      end: endSound,
+    const audioElements: Record<string, HTMLAudioElement> = {
+      correct: new Audio(SOUND_PATHS.correct),
+      incorrect: new Audio(SOUND_PATHS.incorrect),
+      start: new Audio(SOUND_PATHS.start),
+      end: new Audio(SOUND_PATHS.end)
+    };
+    
+    // Set volume for all sounds (increase volume to 1.0)
+    Object.values(audioElements).forEach(audio => {
+      audio.volume = 1.0;
+      
+      // Force preload
+      audio.preload = 'auto';
+      
+      // Optional: add event listeners to verify loading
+      audio.addEventListener('canplaythrough', () => {
+        console.log(`Sound loaded: ${audio.src}`);
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error(`Error loading sound: ${audio.src}`, e);
+      });
+      
+      // Start loading
+      try {
+        audio.load();
+      } catch (err) {
+        console.error('Error loading audio:', err);
+      }
     });
-
-    // Preload sounds
-    correctSound.load();
-    incorrectSound.load();
-    startSound.load();
-    endSound.load();
-
+    
+    setSounds(audioElements);
+    
     return () => {
       // Clean up
-      Object.values(sounds).forEach(sound => {
-        if (sound) {
-          sound.pause();
-          sound.currentTime = 0;
-        }
+      Object.values(audioElements).forEach(sound => {
+        sound.pause();
+        sound.src = '';
       });
     };
   }, []);
@@ -91,8 +112,26 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const playSound = (type: 'correct' | 'incorrect' | 'start' | 'end') => {
     const sound = sounds[type];
     if (sound) {
+      console.log(`Playing sound: ${type} from ${sound.src}`);
+      // Reset to beginning and ensure volume is up
       sound.currentTime = 0;
-      sound.play().catch(e => console.error('Error playing sound:', e));
+      sound.volume = 1.0;
+      
+      // Use try/catch to handle play errors
+      try {
+        const playPromise = sound.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => {
+            console.error(`Error playing sound: ${e.message}`);
+            // Attempt to reload the sound if there was an error
+            sound.load();
+          });
+        }
+      } catch (e) {
+        console.error('Error playing sound:', e);
+      }
+    } else {
+      console.warn(`Sound not loaded for type: ${type}`);
     }
   };
 
