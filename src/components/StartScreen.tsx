@@ -25,7 +25,7 @@ const StartScreen: React.FC = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Polska Ortografia
+          Helenki Polska Ortografia
         </motion.h1>
         
         <motion.div 

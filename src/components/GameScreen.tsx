@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameContext } from './GameContext';
 import WordChallenge from './WordChallenge';
 import { motion } from 'framer-motion';
+import { Button } from './ui/button';
 
 const GameScreen: React.FC = () => {
   const { 
@@ -14,10 +15,17 @@ const GameScreen: React.FC = () => {
     goToNextChallenge 
   } = useGameContext();
   
+  const [showNextButton, setShowNextButton] = useState(false);
+  
   const handleAnswer = (isCorrect: boolean) => {
     if (isCorrect) {
       incrementScore();
     }
+    setShowNextButton(true);
+  };
+  
+  const handleNext = () => {
+    setShowNextButton(false);
     goToNextChallenge();
   };
   
@@ -53,6 +61,23 @@ const GameScreen: React.FC = () => {
             challenge={currentChallenge} 
             onAnswer={handleAnswer} 
           />
+          
+          {showNextButton && (
+            <motion.div 
+              className="mt-6 flex justify-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Button 
+                onClick={handleNext}
+                className="px-8 py-2 text-lg"
+                size="lg"
+              >
+                Dalej
+              </Button>
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </motion.div>

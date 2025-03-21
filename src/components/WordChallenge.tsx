@@ -27,10 +27,7 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) =>
       playSound('incorrect');
     }
     
-    // Delay before moving to next challenge
-    setTimeout(() => {
-      onAnswer(isCorrect);
-    }, 1500);
+    onAnswer(isCorrect);
   };
   
   const isCorrectAnswer = (option: string) => {
