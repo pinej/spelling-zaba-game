@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from 'react';
 
-// Define sound file paths
+// Define sound file paths with correct path references
 const SOUND_PATHS = {
-  correct: process.env.PUBLIC_URL + '/correct.mp3',
-  incorrect: process.env.PUBLIC_URL + '/incorrect.mp3',
-  start: process.env.PUBLIC_URL + '/start.mp3',
-  end: process.env.PUBLIC_URL + '/end.mp3'
+  correct: '/correct.mp3',
+  incorrect: '/incorrect.mp3',
+  start: '/start.mp3',
+  end: '/end.mp3'
 };
 
 type SoundType = 'correct' | 'incorrect' | 'start' | 'end';
@@ -104,6 +104,7 @@ export function useAudio() {
       const testSound = audioElements.start;
       if (testSound) {
         testSound.currentTime = 0;
+        testSound.volume = 0.5; // Lower volume for test sound
         testSound.play().then(() => {
           console.log("Test sound played successfully");
         }).catch(err => {
