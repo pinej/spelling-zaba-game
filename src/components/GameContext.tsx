@@ -42,7 +42,7 @@ type GameProviderProps = {
   children: ReactNode;
 };
 
-// Define sound file paths
+// Define sound file paths with proper references
 const SOUND_PATHS = {
   correct: '/correct.mp3',
   incorrect: '/incorrect.mp3',
@@ -62,76 +62,140 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     start: null,
     end: null,
   });
+  const [audioInitialized, setAudioInitialized] = useState(false);
   
   const totalRounds = 10;
 
-  // Create and preload audio elements
+  // Create and enable audio only after user interaction
   useEffect(() => {
-    const audioElements: Record<string, HTMLAudioElement> = {
-      correct: new Audio(SOUND_PATHS.correct),
-      incorrect: new Audio(SOUND_PATHS.incorrect),
-      start: new Audio(SOUND_PATHS.start),
-      end: new Audio(SOUND_PATHS.end)
+    // Create a user interaction handler to enable audio
+    const enableAudio = () => {
+      console.log("User interaction detected - enabling audio");
+      
+      const audioElements: Record<string, HTMLAudioElement> = {
+        correct: new Audio(SOUND_PATHS.correct),
+        incorrect: new Audio(SOUND_PATHS.incorrect),
+        start: new Audio(SOUND_PATHS.start),
+        end: new Audio(SOUND_PATHS.end)
+      };
+      
+      // Set volume and preload for all sounds
+      Object.values(audioElements).forEach(audio => {
+        audio.volume = 1.0;
+        audio.muted = false;
+        audio.preload = 'auto';
+        
+        // Force a load attempt
+        audio.load();
+        
+        // Add event listeners to verify loading
+        audio.addEventListener('canplaythrough', () => {
+          console.log(`Sound loaded: ${audio.src}`);
+        });
+        
+        audio.addEventListener('error', (e) => {
+          console.error(`Error loading sound: ${audio.src}`, e);
+        });
+        
+        // Test playback and immediately pause (to enable audio context)
+        const testPlay = audio.play().catch(err => {
+          console.warn("Initial audio test play failed:", err.message);
+        });
+        
+        if (testPlay !== undefined) {
+          testPlay.then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+            console.log(`Audio successfully initialized: ${audio.src}`);
+          });
+        }
+      });
+      
+      setSounds(audioElements);
+      setAudioInitialized(true);
+      
+      // Remove the event listeners once audio is enabled
+      window.removeEventListener('click', enableAudio);
+      window.removeEventListener('touchstart', enableAudio);
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
     };
     
-    // Set volume for all sounds (increase volume to 1.0)
-    Object.values(audioElements).forEach(audio => {
-      audio.volume = 1.0;
-      
-      // Force preload
-      audio.preload = 'auto';
-      
-      // Optional: add event listeners to verify loading
-      audio.addEventListener('canplaythrough', () => {
-        console.log(`Sound loaded: ${audio.src}`);
-      });
-      
-      audio.addEventListener('error', (e) => {
-        console.error(`Error loading sound: ${audio.src}`, e);
-      });
-      
-      // Start loading
-      try {
-        audio.load();
-      } catch (err) {
-        console.error('Error loading audio:', err);
-      }
-    });
-    
-    setSounds(audioElements);
+    // Add event listeners for user interaction
+    window.addEventListener('click', enableAudio);
+    window.addEventListener('touchstart', enableAudio);
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
     
     return () => {
-      // Clean up
-      Object.values(audioElements).forEach(sound => {
-        sound.pause();
-        sound.src = '';
+      // Clean up event listeners
+      window.removeEventListener('click', enableAudio);
+      window.removeEventListener('touchstart', enableAudio);
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
+      
+      // Clean up audio elements
+      Object.values(sounds).forEach(sound => {
+        if (sound) {
+          sound.pause();
+          sound.src = '';
+        }
       });
     };
   }, []);
 
   const playSound = (type: 'correct' | 'incorrect' | 'start' | 'end') => {
     const sound = sounds[type];
-    if (sound) {
-      console.log(`Playing sound: ${type} from ${sound.src}`);
-      // Reset to beginning and ensure volume is up
-      sound.currentTime = 0;
-      sound.volume = 1.0;
-      
-      // Use try/catch to handle play errors
-      try {
-        const playPromise = sound.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(e => {
-            console.error(`Error playing sound: ${e.message}`);
-            // Attempt to reload the sound if there was an error
-            sound.load();
-          });
-        }
-      } catch (e) {
-        console.error('Error playing sound:', e);
-      }
-    } else {
+    
+    if (!sound) {
       console.warn(`Sound not loaded for type: ${type}`);
+      return;
+    }
+    
+    console.log(`Attempting to play sound: ${type} from ${sound.src}`);
+    
+    // Reset to beginning and ensure volume is up
+    sound.currentTime = 0;
+    sound.volume = 1.0;
+    sound.muted = false;
+    
+    try {
+      // Create a new AudioContext to help with browser policies
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        const audioContext = new AudioContextClass();
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+      }
+      
+      const playPromise = sound.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log(`Sound playing successfully: ${type}`);
+          })
+          .catch(e => {
+            console.error(`Error playing sound: ${e.message}`);
+            
+            // If there's an autoplay policy issue, attach a temporary click handler
+            if (e.name === 'NotAllowedError') {
+              console.log("Creating temporary click handler to enable audio");
+              
+              const tempHandler = () => {
+                sound.play().catch(err => console.error("Still could not play sound:", err));
+                document.removeEventListener('click', tempHandler);
+                document.removeEventListener('touchstart', tempHandler);
+              };
+              
+              document.addEventListener('click', tempHandler);
+              document.addEventListener('touchstart', tempHandler);
+            }
+          });
+      }
+    } catch (e) {
+      console.error('Critical error playing sound:', e);
     }
   };
 
