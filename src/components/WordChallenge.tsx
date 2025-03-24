@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useGameContext } from './GameContext';
 import { Challenge } from '../types/game';
@@ -7,9 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 type WordChallengeProps = {
   challenge: Challenge;
   onAnswer: (isCorrect: boolean) => void;
+  playerName?: string;
 };
 
-const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) => {
+const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer, playerName }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const { playSound, addIncorrectAnswer } = useGameContext();
@@ -63,7 +63,7 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) =>
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          Wybierz brakującą literę:
+          {playerName ? `${playerName}, wybierz brakującą literę:` : 'Wybierz brakującą literę:'}
         </motion.div>
         
         <motion.div 
