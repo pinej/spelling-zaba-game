@@ -5,6 +5,7 @@ import { useGameContext } from './GameContext';
 import { Button } from './ui/button';
 import { Home, Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SoundToggle from './SoundToggle';
 
 const MultiplicationChallenge: React.FC = () => {
   const { 
@@ -26,7 +27,7 @@ const MultiplicationChallenge: React.FC = () => {
   const navigate = useNavigate();
   
   const handleReturnToHome = () => {
-    navigate('/');
+    navigate('/game-selection');
   };
   
   useEffect(() => {
@@ -74,6 +75,8 @@ const MultiplicationChallenge: React.FC = () => {
           <Home size={16} />
           Powrót
         </Button>
+        
+        <SoundToggle />
         
         <div className="flex items-center gap-2 text-muted-foreground">
           <Calculator className="h-5 w-5" />

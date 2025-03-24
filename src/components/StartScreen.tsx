@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
-import { Sparkles, Volume2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
 const StartScreen: React.FC = () => {
-  const { soundsEnabled, enableSounds, setPlayerName, playerName } = useGameContext();
+  const { setPlayerName, playerName } = useGameContext();
   const [nameInput, setNameInput] = useState(playerName || '');
   
   const handleContinue = () => {
@@ -63,25 +63,6 @@ const StartScreen: React.FC = () => {
             className="mb-2"
           />
         </motion.div>
-        
-        {!soundsEnabled && (
-          <motion.div
-            className="mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.0, duration: 0.5 }}
-          >
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={enableSounds}
-              className="flex items-center gap-2 mb-4"
-            >
-              <Volume2 size={16} />
-              Włącz dźwięki
-            </Button>
-          </motion.div>
-        )}
         
         <motion.button
           className="bg-primary text-primary-foreground text-lg md:text-xl px-10 py-4 rounded-full shadow-lg button-hover animate-pulse-scale"

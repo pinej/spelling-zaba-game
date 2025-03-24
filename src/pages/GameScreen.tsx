@@ -7,6 +7,7 @@ import { Home, Book } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SoundToggle from '../components/SoundToggle';
 
 const GameScreen: React.FC = () => {
   const { 
@@ -26,7 +27,7 @@ const GameScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const handleReturnToHome = () => {
-    navigate('/');
+    navigate('/game-selection');
   };
 
   // For the "spelling" game type
@@ -82,6 +83,8 @@ const GameScreen: React.FC = () => {
               <Home size={16} />
               Powrót
             </Button>
+            
+            <SoundToggle />
             
             <div className="flex items-center gap-2 text-muted-foreground">
               <Book className="h-5 w-5" />

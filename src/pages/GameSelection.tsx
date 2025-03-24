@@ -6,6 +6,7 @@ import { BookText, Calculator, Home } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import SoundToggle from '../components/SoundToggle';
 
 const GameSelection: React.FC = () => {
   const { playerName, resetGame, setGameType } = useGameContext();
@@ -28,7 +29,6 @@ const GameSelection: React.FC = () => {
   };
 
   return (
-    
     <motion.div
       className="min-h-screen flex flex-col items-center bg-blue-50 py-8 px-4"
       initial={{ opacity: 0 }}
@@ -45,6 +45,7 @@ const GameSelection: React.FC = () => {
             <Home size={18} />
             Powrót
           </Button>
+          <SoundToggle />
         </div>
 
         <motion.div
