@@ -64,10 +64,7 @@ const GameSelection: React.FC = () => {
             whileHover={{ scale: 1.03 }}
             className="transition duration-200"
           >
-            <Card 
-              className="h-full cursor-pointer hover:border-primary"
-              onClick={handleStartSpellingGame}
-            >
+            <Card className="h-full hover:border-primary">
               <CardHeader className="bg-primary/10 rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
                   <BookText className="h-6 w-6 text-primary" />
@@ -77,7 +74,10 @@ const GameSelection: React.FC = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 <p>Wybierz poprawną literę w każdym słowie i zdobądź punkty!</p>
-                <Button className="w-full mt-6">
+                <Button 
+                  className="w-full mt-6"
+                  onClick={handleStartSpellingGame}
+                >
                   Zagraj teraz
                 </Button>
               </CardContent>
@@ -91,10 +91,7 @@ const GameSelection: React.FC = () => {
             whileHover={{ scale: 1.03 }}
             className="transition duration-200"
           >
-            <Card 
-              className="h-full cursor-pointer hover:border-primary" 
-              onClick={handleStartMultiplicationGame}
-            >
+            <Card className="h-full hover:border-primary">
               <CardHeader className="bg-accent/20 rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
                   <Calculator className="h-6 w-6 text-accent" />
@@ -104,7 +101,10 @@ const GameSelection: React.FC = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 <p>Rozwiązuj działania mnożenia i stań się mistrzem matematyki!</p>
-                <Button className="w-full mt-6 bg-accent hover:bg-accent/90">
+                <Button 
+                  className="w-full mt-6 bg-accent hover:bg-accent/90"
+                  onClick={handleStartMultiplicationGame}
+                >
                   Zagraj teraz
                 </Button>
               </CardContent>
