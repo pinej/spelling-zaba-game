@@ -45,7 +45,7 @@ const StartScreen: React.FC = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Edukacyjne Gry dla Dzieci
+          Gram i uczę się
         </motion.h1>
         
         <motion.div
