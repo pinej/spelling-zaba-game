@@ -7,12 +7,13 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 
 const StartScreen: React.FC = () => {
-  const { resetGame, soundsEnabled, enableSounds, setPlayerName, playerName } = useGameContext();
+  const { soundsEnabled, enableSounds, setPlayerName, playerName } = useGameContext();
   const [nameInput, setNameInput] = useState(playerName || '');
   
-  const handleStartGame = () => {
+  const handleContinue = () => {
     setPlayerName(nameInput.trim());
-    resetGame();
+    // Changed to go to selection screen instead of directly starting the game
+    window.location.href = '/game-selection';
   };
   
   return (
@@ -39,31 +40,13 @@ const StartScreen: React.FC = () => {
         </motion.div>
         
         <motion.h1 
-          className="text-3xl md:text-4xl font-bold mb-2 text-primary-foreground"
+          className="text-3xl md:text-4xl font-bold mb-6 text-primary-foreground"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Helenki Polska Ortografia
+          Edukacyjne Gry dla Dzieci
         </motion.h1>
-        
-        <motion.div 
-          className="text-xl text-primary mb-6"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          Nauka trudnych liter
-        </motion.div>
-        
-        <motion.p 
-          className="mb-6 text-muted-foreground"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          Wybierz poprawną literę w każdym słowie i zdobądź punkty!
-        </motion.p>
         
         <motion.div
           className="w-full max-w-xs mb-6"
@@ -102,14 +85,14 @@ const StartScreen: React.FC = () => {
         
         <motion.button
           className="bg-primary text-primary-foreground text-lg md:text-xl px-10 py-4 rounded-full shadow-lg button-hover animate-pulse-scale"
-          onClick={handleStartGame}
+          onClick={handleContinue}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.1, duration: 0.5 }}
         >
-          START
+          DALEJ
         </motion.button>
       </motion.div>
     </motion.div>

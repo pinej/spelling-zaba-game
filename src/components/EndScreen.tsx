@@ -2,8 +2,8 @@
 import React from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Home } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Button } from './ui/button';
 
 const EndScreen: React.FC = () => {
@@ -13,140 +13,120 @@ const EndScreen: React.FC = () => {
     resetGame, 
     setGameStatus, 
     incorrectAnswers, 
-    playerName 
+    incorrectMultiplicationAnswers,
+    playerName,
+    gameType
   } = useGameContext();
   
-  const scorePercentage = (score / totalRounds) * 100;
-  
-  const getFeedback = () => {
-    const playerNamePrefix = playerName ? `${playerName}, ` : '';
-    
-    if (scorePercentage >= 90) return `${playerNamePrefix}wspaniale! Jesteś mistrzem ortografii!`;
-    if (scorePercentage >= 70) return `${playerNamePrefix}bardzo dobrze! Prawie wszystko umiesz!`;
-    if (scorePercentage >= 50) return `${playerNamePrefix}dobrze! Ale warto jeszcze poćwiczyć.`;
-    return `${playerNamePrefix}spróbuj jeszcze raz, na pewno się uda!`;
+  const handleReturnToHome = () => {
+    setGameStatus('start');
+    window.location.href = '/';
   };
   
-  const hasIncorrectAnswers = incorrectAnswers.length > 0;
+  const handlePlayAgain = () => {
+    resetGame();
+  };
+  
+  // Calculate percentage score
+  const percentage = Math.round((score / totalRounds) * 100);
+  
+  // Personalized feedback based on score
+  const getFeedback = () => {
+    if (percentage >= 90) return `Wspaniale, ${playerName}! Jesteś mistrzem!`;
+    if (percentage >= 70) return `Bardzo dobrze, ${playerName}! Robisz postępy!`;
+    if (percentage >= 50) return `Dobrze, ${playerName}. Możesz być z siebie dumny/a!`;
+    return `${playerName}, ćwicz dalej a będzie lepiej!`;
+  };
   
   return (
     <motion.div 
-      className="min-h-screen flex flex-col items-center justify-center p-4"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-blue-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="absolute top-4 left-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => setGameStatus('start')}
-          className="flex items-center gap-2"
-        >
-          <Home size={16} />
-          Powrót do menu
-        </Button>
-      </div>
-      
       <motion.div 
-        className="glass-card max-w-lg w-full text-center p-8"
+        className="glass-card p-8 max-w-3xl w-full"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <motion.h2 
-          className="text-3xl font-bold mb-2"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          Koniec gry!
-        </motion.h2>
-        
-        <motion.div 
-          className="text-6xl font-bold my-6 text-primary"
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5, type: "spring" }}
-        >
-          {score} / {totalRounds}
-        </motion.div>
-        
-        <motion.p 
-          className="mb-8 text-lg"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          {getFeedback()}
-        </motion.p>
-        
-        {hasIncorrectAnswers && (
-          <motion.div
-            className="mb-8"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.9, duration: 0.5 }}
+        <div className="flex justify-between items-center mb-6">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2"
+            onClick={handleReturnToHome}
           >
-            <motion.h3
-              className="text-xl font-bold mb-4 text-destructive"
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.0, duration: 0.5 }}
-            >
-              {playerName ? `${playerName}, zapamiętaj te słowa!` : 'Zapamiętaj te słowa!'}
-            </motion.h3>
-            
+            <Home size={16} />
+            Powrót
+          </Button>
+        </div>
+        
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-primary mb-4">Koniec gry!</h1>
+          <p className="text-xl mb-2">
+            Twój wynik: <span className="font-bold">{score}/{totalRounds}</span> ({percentage}%)
+          </p>
+          <p className="text-lg text-muted-foreground">{getFeedback()}</p>
+        </div>
+        
+        {gameType === 'spelling' && incorrectAnswers.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Popracuj nad tymi słowami:</h2>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Słowo</TableHead>
-                  <TableHead>Poprawna litera</TableHead>
+                  <TableHead>Poprawna odpowiedź</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {incorrectAnswers.map((challenge, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">
+                {incorrectAnswers.map((challenge) => (
+                  <TableRow key={challenge.id}>
+                    <TableCell>
                       {challenge.prefix}
                       <span className="text-destructive font-bold">{challenge.correctOption}</span>
                       {challenge.suffix}
                     </TableCell>
-                    <TableCell className="text-center font-bold text-destructive">
-                      {challenge.correctOption}
-                    </TableCell>
+                    <TableCell className="font-medium">{challenge.correctOption}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </motion.div>
+          </div>
         )}
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <motion.button
-            className="bg-primary text-white px-6 py-3 rounded-full shadow-md button-hover"
-            onClick={resetGame}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
+        {gameType === 'multiplication' && incorrectMultiplicationAnswers.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Popracuj nad tymi działaniami:</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Działanie</TableHead>
+                  <TableHead>Poprawna odpowiedź</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {incorrectMultiplicationAnswers.map((challenge) => (
+                  <TableRow key={challenge.id}>
+                    <TableCell>
+                      {challenge.firstNumber} × {challenge.secondNumber}
+                    </TableCell>
+                    <TableCell className="font-medium">{challenge.correctAnswer}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        
+        <div className="flex justify-center mt-8">
+          <Button
+            className="px-8 py-6 text-lg bg-primary"
+            onClick={handlePlayAgain}
           >
-            Zagraj Ponownie
-          </motion.button>
-          
-          <motion.button
-            className="bg-secondary text-secondary-foreground px-6 py-3 rounded-full shadow-md button-hover"
-            onClick={() => setGameStatus('start')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 1.4, duration: 0.5 }}
-          >
-            Menu Główne
-          </motion.button>
+            Zagraj ponownie
+          </Button>
         </div>
       </motion.div>
     </motion.div>
