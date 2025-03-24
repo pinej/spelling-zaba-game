@@ -1,29 +1,33 @@
-
 import React from 'react';
 import { useGameContext } from '../components/GameContext';
 import { motion } from 'framer-motion';
 import { BookText, Calculator, Home } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 const GameSelection: React.FC = () => {
   const { playerName, resetGame, setGameType } = useGameContext();
+  const navigate = useNavigate();
 
   const handleStartSpellingGame = () => {
     setGameType('spelling');
     resetGame();
+    navigate('/game'); // Navigate to the game screen after setting the game type
   };
 
   const handleStartMultiplicationGame = () => {
     setGameType('multiplication');
     resetGame();
+    navigate('/game'); // Navigate to the game screen after setting the game type
   };
 
   const handleReturnToHome = () => {
-    window.location.href = '/';
+    navigate('/');
   };
 
   return (
+    
     <motion.div
       className="min-h-screen flex flex-col items-center bg-blue-50 py-8 px-4"
       initial={{ opacity: 0 }}
