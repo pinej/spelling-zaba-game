@@ -6,7 +6,25 @@ import MultiplicationChallenge from '../components/MultiplicationChallenge';
 import EndScreen from '../components/EndScreen';
 
 const GameScreen: React.FC = () => {
-  const { gameStatus, gameType } = useGameContext();
+  const { 
+    gameStatus, 
+    gameType, 
+    currentChallenge, 
+    incrementScore, 
+    goToNextChallenge, 
+    playSound, 
+    addIncorrectAnswer 
+  } = useGameContext();
+  
+  // Handle answer for WordChallenge
+  const handleAnswer = (isCorrect: boolean) => {
+    if (isCorrect) {
+      incrementScore();
+    }
+    
+    // Go to next challenge after a delay
+    setTimeout(goToNextChallenge, 1500);
+  };
   
   // Render appropriate screen based on game status
   if (gameStatus === 'end') {
@@ -15,13 +33,16 @@ const GameScreen: React.FC = () => {
   
   // Render the appropriate game based on the game type
   return (
-    <>
-      {gameType === 'spelling' ? (
-        <WordChallenge />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50">
+      {gameType === 'spelling' && currentChallenge ? (
+        <WordChallenge 
+          challenge={currentChallenge} 
+          onAnswer={handleAnswer} 
+        />
       ) : (
         <MultiplicationChallenge />
       )}
-    </>
+    </div>
   );
 };
 
