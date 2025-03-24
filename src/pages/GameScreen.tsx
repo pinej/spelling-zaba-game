@@ -30,10 +30,8 @@ const GameScreen: React.FC = () => {
   };
 
   // For the "spelling" game type
-  const handleWordAnswer = (selectedLetter: string) => {
+  const handleWordAnswer = (isCorrect: boolean) => {
     if (!currentChallenge) return;
-    
-    const isCorrect = selectedLetter === currentChallenge.correctAnswer;
     
     if (isCorrect) {
       incrementScore();
