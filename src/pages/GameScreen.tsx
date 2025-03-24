@@ -3,78 +3,115 @@ import React from 'react';
 import { useGameContext } from '../components/GameContext';
 import WordChallenge from '../components/WordChallenge';
 import MultiplicationChallenge from '../components/MultiplicationChallenge';
-import EndScreen from '../components/EndScreen';
-import { Button } from '@/components/ui/button';
-import { Home, BookText } from 'lucide-react';
+import { Home, Book } from 'lucide-react';
+import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const GameScreen: React.FC = () => {
   const { 
-    gameStatus, 
     gameType, 
     currentChallenge, 
-    incrementScore, 
-    goToNextChallenge, 
-    playSound, 
+    currentMultiplicationChallenge, 
+    goToNextChallenge,
     addIncorrectAnswer,
+    addIncorrectMultiplicationAnswer,
+    incrementScore,
+    playSound,
     currentRound,
     totalRounds,
-    setGameStatus
+    playerName,
+    updateStreak
   } = useGameContext();
-  
   const navigate = useNavigate();
-  
+
   const handleReturnToHome = () => {
-    setGameStatus('start');
     navigate('/');
   };
-  
-  // Handle answer for WordChallenge
-  const handleAnswer = (isCorrect: boolean) => {
+
+  // For the "spelling" game type
+  const handleWordAnswer = (selectedLetter: string) => {
+    if (!currentChallenge) return;
+    
+    const isCorrect = selectedLetter === currentChallenge.correctAnswer;
+    
     if (isCorrect) {
       incrementScore();
+      playSound('correct');
+      updateStreak(true);
+    } else {
+      playSound('incorrect');
+      addIncorrectAnswer(currentChallenge);
+      updateStreak(false);
     }
     
-    // Go to next challenge after a delay
-    setTimeout(goToNextChallenge, 1500);
+    setTimeout(() => {
+      goToNextChallenge();
+    }, 1500);
   };
   
-  // Render appropriate screen based on game status
-  if (gameStatus === 'end') {
-    return <EndScreen />;
-  }
-  
-  // Render the appropriate game based on the game type
+  // For the "multiplication" game type
+  const handleMultiplicationAnswer = (selectedAnswer: number) => {
+    if (!currentMultiplicationChallenge) return;
+    
+    const isCorrect = selectedAnswer === currentMultiplicationChallenge.correctAnswer;
+    
+    if (isCorrect) {
+      incrementScore();
+      playSound('correct');
+      updateStreak(true);
+    } else {
+      playSound('incorrect');
+      addIncorrectMultiplicationAnswer(currentMultiplicationChallenge);
+      updateStreak(false);
+    }
+    
+    setTimeout(() => {
+      goToNextChallenge();
+    }, 1500);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50">
-      <div className="w-full max-w-3xl px-4">
-        <div className="flex justify-between items-center mb-6">
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2"
-            onClick={handleReturnToHome}
-          >
-            <Home size={16} />
-            Powrót
-          </Button>
-          
-          {gameType === 'spelling' && (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 py-8 px-4">
+      {gameType === 'spelling' && (
+        <div className="max-w-3xl mx-auto">
+          <div className="w-full flex items-center justify-between mb-6">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2"
+              onClick={handleReturnToHome}
+            >
+              <Home size={16} />
+              Powrót
+            </Button>
+            
             <div className="flex items-center gap-2 text-muted-foreground">
-              <BookText className="h-5 w-5" />
+              <Book className="h-5 w-5" />
               <span>Pytanie {currentRound + 1} z {totalRounds}</span>
             </div>
-          )}
+          </div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {currentChallenge && (
+              <WordChallenge
+                challenge={currentChallenge}
+                onAnswer={handleWordAnswer}
+                playerName={playerName}
+              />
+            )}
+          </motion.div>
         </div>
-        
-        {gameType === 'spelling' && currentChallenge ? (
-          <WordChallenge 
-            challenge={currentChallenge} 
-            onAnswer={handleAnswer} 
-          />
-        ) : (
+      )}
+      
+      {gameType === 'multiplication' && (
+        <div className="max-w-3xl mx-auto">
           <MultiplicationChallenge />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

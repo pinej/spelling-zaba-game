@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameContext } from './GameContext';
 import { Button } from './ui/button';
 import { Home, Calculator } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MultiplicationChallenge: React.FC = () => {
   const { 
@@ -15,7 +16,6 @@ const MultiplicationChallenge: React.FC = () => {
     currentRound,
     totalRounds,
     playerName,
-    setGameStatus,
     updateStreak,
     streak
   } = useGameContext();
@@ -23,10 +23,10 @@ const MultiplicationChallenge: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const navigate = useNavigate();
   
   const handleReturnToHome = () => {
-    setGameStatus('start');
-    window.location.href = '/';
+    navigate('/');
   };
   
   useEffect(() => {
