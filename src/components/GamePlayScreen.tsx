@@ -1,7 +1,9 @@
-
 import React from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
+import { Button } from './ui/button';
+import { Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const GamePlayScreen: React.FC = () => {
   const { 
@@ -18,6 +20,11 @@ const GamePlayScreen: React.FC = () => {
     playSound,
     updateStreak
   } = useGameContext();
+  const navigate = useNavigate();
+
+  const handleReturnToHome = () => {
+    navigate('/game-selection');
+  };
 
   const handleAnswer = (selectedAnswer: string | number) => {
     let isCorrect = false;
@@ -52,7 +59,14 @@ const GamePlayScreen: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center">
       <div className="game-content bg-white p-8 rounded-xl shadow-lg max-w-md w-full mb-8">
         <div className="flex justify-between mb-6">
-          <div className="text-2xl font-bold text-blue-600">Wynik: {score}</div>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2"
+            onClick={handleReturnToHome}
+          >
+            <Home size={16} />
+            Powrót
+          </Button>
           <div className="text-lg text-gray-600">
             Runda: {currentRound + 1} / {totalRounds}
           </div>
@@ -97,6 +111,8 @@ const GamePlayScreen: React.FC = () => {
             </div>
           </div>
         )}
+
+        <div className="text-2xl font-bold text-blue-600">Wynik: {score}</div>
       </div>
     </div>
   );
