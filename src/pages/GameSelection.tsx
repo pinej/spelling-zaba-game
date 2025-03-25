@@ -9,19 +9,15 @@ import { useNavigate } from 'react-router-dom';
 import SoundToggle from '../components/SoundToggle';
 
 const GameSelection: React.FC = () => {
-  const { playerName, resetGame, setGameType } = useGameContext();
+  const { playerName } = useGameContext();
   const navigate = useNavigate();
 
   const handleStartSpellingGame = () => {
-    setGameType('spelling');
-    resetGame();
-    navigate('/game'); // Navigate to the game screen after setting the game type
+    navigate('/ortografia'); // Navigate to the spelling game route
   };
 
   const handleStartMultiplicationGame = () => {
-    setGameType('multiplication');
-    resetGame();
-    navigate('/game'); // Navigate to the game screen after setting the game type
+    navigate('/mnozenie'); // Navigate to the multiplication game route
   };
 
   const handleReturnToHome = () => {
