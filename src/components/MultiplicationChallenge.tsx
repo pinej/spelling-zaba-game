@@ -5,7 +5,6 @@ import { useGameContext } from './GameContext';
 import { Button } from './ui/button';
 import { Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import SoundToggle from './SoundToggle';
 import { MultiplicationChallenge as MultiplicationChallengeType } from '../types/game';
 
 interface MultiplicationChallengeProps {
@@ -22,7 +21,6 @@ const MultiplicationChallenge: React.FC<MultiplicationChallengeProps> = ({
     goToNextChallenge, 
     incrementScore, 
     addIncorrectMultiplicationAnswer,
-    playSound,
     currentRound,
     totalRounds,
     playerName,
@@ -56,10 +54,8 @@ const MultiplicationChallenge: React.FC<MultiplicationChallengeProps> = ({
     } else {
       if (correct) {
         incrementScore();
-        playSound('correct');
         updateStreak(true);
       } else {
-        playSound('incorrect');
         addIncorrectMultiplicationAnswer(activeChallenge);
         updateStreak(false);
       }
@@ -78,7 +74,7 @@ const MultiplicationChallenge: React.FC<MultiplicationChallengeProps> = ({
   return (
     <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
       <div className="w-full flex items-center justify-between mb-6">
-        <SoundToggle />
+        <div></div>
         
         <div className="flex items-center gap-2 text-muted-foreground">
           <Calculator className="h-5 w-5" />
