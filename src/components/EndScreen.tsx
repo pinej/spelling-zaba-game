@@ -28,7 +28,13 @@ const EndScreen: React.FC = () => {
   
   const handlePlayAgain = () => {
     resetGame();
-    setGameStatus('playing');
+    
+    // Navigate to the appropriate game route based on gameType
+    if (gameType === 'spelling') {
+      navigate('/ortografia');
+    } else if (gameType === 'multiplication') {
+      navigate('/mnozenie');
+    }
   };
   
   // Calculate percentage score

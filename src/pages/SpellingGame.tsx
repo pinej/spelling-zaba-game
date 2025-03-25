@@ -19,6 +19,7 @@ const SpellingGame: React.FC = () => {
     streak,
     resetGame,
     setGameType,
+    setGameStatus
   } = useGameContext();
   
   const navigate = useNavigate();
@@ -43,11 +44,13 @@ const SpellingGame: React.FC = () => {
     }
 
     updateStreak(isCorrect);
-    goToNextChallenge();
     
     // Check if game is finished
     if (currentRound + 1 >= totalRounds) {
+      setGameStatus('end');
       navigate('/game');
+    } else {
+      goToNextChallenge();
     }
   };
 
