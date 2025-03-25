@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useGameContext } from '../components/GameContext';
 import { useNavigate } from 'react-router-dom';
@@ -85,9 +84,7 @@ const GameScreen: React.FC = () => {
               Zacznij od nowa
             </Button>
           </div>
-          <div className="text-lg font-semibold text-gray-700">
-            Runda: {currentRound + 1} / {totalRounds}
-          </div>
+          {/* Removed the round information div */}
         </div>
 
         <div className="mb-8">
