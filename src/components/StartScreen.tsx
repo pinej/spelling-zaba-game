@@ -5,13 +5,16 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import SoundToggle from './SoundToggle';
 
 const StartScreen: React.FC = () => {
-  const { setPlayerName, playerName } = useGameContext();
+  const { setPlayerName, playerName, playSound } = useGameContext();
   const [nameInput, setNameInput] = useState(playerName || '');
   
   const handleContinue = () => {
     setPlayerName(nameInput.trim());
+    // Play sound only when clicking DALEJ button
+    playSound('start');
     // Changed to go to selection screen instead of directly starting the game
     window.location.href = '/game-selection';
   };
@@ -29,6 +32,10 @@ const StartScreen: React.FC = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
+        <div className="w-full flex justify-end mb-4">
+          <SoundToggle />
+        </div>
+        
         <motion.div
           className="flex items-center justify-center mb-4"
           initial={{ scale: 0.9, opacity: 0 }}
