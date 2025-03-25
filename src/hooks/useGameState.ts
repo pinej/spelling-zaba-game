@@ -1,28 +1,29 @@
 
 import { useState, useEffect } from 'react';
-import { generateChallenges } from '../utils/gameUtils';
-import { generateMultiplicationChallenges } from '../utils/multiplicationUtils';
-import { GameStatus, Challenge, GameType, MultiplicationChallenge, StreakInfo } from '../types/game';
+import { GameStatus, GameType, Challenge, MultiplicationChallenge } from '../types/game';
 import { useAudio } from './useAudio';
+import { useStreak } from './useStreak';
+import { useChallenges } from './useChallenges';
 
 export function useGameState() {
   const [gameStatus, setGameStatus] = useState<GameStatus>('start');
   const [gameType, setGameType] = useState<GameType>('spelling');
   const [score, setScore] = useState(0);
   const [currentRound, setCurrentRound] = useState(0);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [multiplicationChallenges, setMultiplicationChallenges] = useState<MultiplicationChallenge[]>([]);
-  const [incorrectAnswers, setIncorrectAnswers] = useState<Challenge[]>([]);
-  const [incorrectMultiplicationAnswers, setIncorrectMultiplicationAnswers] = useState<MultiplicationChallenge[]>([]);
   const [playerName, setPlayerName] = useState<string>('');
-  const { playSound, soundsEnabled, enableSounds, isMuted, toggleMute } = useAudio();
   
-  // Track streak for showing congratulation messages
-  const [streak, setStreak] = useState<StreakInfo>({
-    currentStreak: 0,
-    showCongratulations: false,
-    congratulationMessage: ''
-  });
+  const { playSound, soundsEnabled, enableSounds, isMuted, toggleMute } = useAudio();
+  const { streak, updateStreak, resetStreak } = useStreak();
+  const { 
+    challenges, 
+    multiplicationChallenges, 
+    incorrectAnswers, 
+    incorrectMultiplicationAnswers,
+    generateGameChallenges,
+    addIncorrectAnswer,
+    addIncorrectMultiplicationAnswer,
+    resetChallenges
+  } = useChallenges();
   
   const totalRounds = 10;
 
@@ -30,14 +31,8 @@ export function useGameState() {
     setScore(0);
     setCurrentRound(0);
     
-    if (gameType === 'spelling') {
-      setChallenges(generateChallenges());
-    } else {
-      setMultiplicationChallenges(generateMultiplicationChallenges());
-    }
-    
-    setIncorrectAnswers([]);
-    setIncorrectMultiplicationAnswers([]);
+    generateGameChallenges(gameType);
+    resetChallenges();
     resetStreak();
     setGameStatus('playing');
     playSound('start');
@@ -45,48 +40,6 @@ export function useGameState() {
 
   const incrementScore = () => {
     setScore(prev => prev + 1);
-  };
-
-  const addIncorrectAnswer = (challenge: Challenge) => {
-    setIncorrectAnswers(prev => [...prev, challenge]);
-  };
-
-  const addIncorrectMultiplicationAnswer = (challenge: MultiplicationChallenge) => {
-    setIncorrectMultiplicationAnswers(prev => [...prev, challenge]);
-  };
-
-  const updateStreak = (correct: boolean) => {
-    if (correct) {
-      const newStreakCount = streak.currentStreak + 1;
-      
-      let showCongrats = false;
-      let message = '';
-      
-      if (newStreakCount === 3) {
-        showCongrats = true;
-        message = "Świetnie Ci idzie!";
-      } else if (newStreakCount === 10) {
-        showCongrats = true;
-        message = "Wow - mistrzowski wynik!";
-      }
-      
-      setStreak({
-        currentStreak: newStreakCount,
-        showCongratulations: showCongrats,
-        congratulationMessage: message
-      });
-    } else {
-      // Reset streak on incorrect answer
-      resetStreak();
-    }
-  };
-
-  const resetStreak = () => {
-    setStreak({
-      currentStreak: 0,
-      showCongratulations: false,
-      congratulationMessage: ''
-    });
   };
 
   const goToNextChallenge = () => {
@@ -100,11 +53,7 @@ export function useGameState() {
 
   useEffect(() => {
     if (gameStatus === 'playing') {
-      if (gameType === 'spelling' && challenges.length === 0) {
-        setChallenges(generateChallenges());
-      } else if (gameType === 'multiplication' && multiplicationChallenges.length === 0) {
-        setMultiplicationChallenges(generateMultiplicationChallenges());
-      }
+      generateGameChallenges(gameType);
     }
   }, [gameStatus, gameType]);
 

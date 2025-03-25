@@ -1,14 +1,13 @@
+
 import { useState, useEffect } from 'react';
-
-// Define sound file paths with correct path references and WAV extension
-const SOUND_PATHS = {
-  correct: '/correct.wav',
-  incorrect: '/incorrect.wav',
-  start: '/start.wav',
-  end: '/end.wav'
-};
-
-type SoundType = 'correct' | 'incorrect' | 'start' | 'end';
+import { 
+  SOUND_PATHS, 
+  SoundType, 
+  createAudioElements, 
+  initializeAudio, 
+  playAudioWithErrorHandling,
+  checkAudioFiles
+} from '../utils/audioUtils';
 
 export function useAudio() {
   const [sounds, setSounds] = useState<Record<string, HTMLAudioElement | null>>({
@@ -55,19 +54,10 @@ export function useAudio() {
     }
     
     // Create and preload audio elements
-    const audioElements: Record<string, HTMLAudioElement> = {
-      correct: new Audio(SOUND_PATHS.correct),
-      incorrect: new Audio(SOUND_PATHS.incorrect),
-      start: new Audio(SOUND_PATHS.start),
-      end: new Audio(SOUND_PATHS.end)
-    };
+    const audioElements = createAudioElements(isMuted);
     
     // Set up all audio elements
     Object.entries(audioElements).forEach(([type, audio]) => {
-      audio.volume = 1.0;
-      audio.muted = isMuted;
-      audio.preload = 'auto';
-      
       // Log success or failure
       audio.addEventListener('canplaythrough', () => {
         console.log(`Sound loaded successfully: ${type}`);
@@ -82,33 +72,20 @@ export function useAudio() {
         }
       });
       
-      // Force loading
-      audio.load();
-      
-      // Test play (and immediately pause) to prime the audio system
-      audio.play().then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-        console.log(`Sound initialized: ${type}`);
-      }).catch(err => {
-        console.warn(`Couldn't initialize sound ${type}:`, err.message);
-      });
+      // Initialize audio
+      initializeAudio(audio, type);
     });
     
     setSounds(audioElements);
     setSoundsEnabled(true);
     
-    // Play a test sound after a short delay to verify sounds are working
+    // Play a test sound after a short delay
     setTimeout(() => {
       const testSound = audioElements.start;
       if (testSound) {
         testSound.currentTime = 0;
         testSound.volume = 0.5; // Lower volume for test sound
-        testSound.play().then(() => {
-          console.log("Test sound played successfully");
-        }).catch(err => {
-          console.error("Test sound failed:", err.message);
-        });
+        initializeAudio(testSound, 'test');
       }
     }, 500);
   };
@@ -125,22 +102,6 @@ export function useAudio() {
     window.addEventListener('click', handleUserInteraction);
     window.addEventListener('touchstart', handleUserInteraction);
     window.addEventListener('keydown', handleUserInteraction);
-    
-    // Check if audio files exist
-    const checkAudioFiles = async () => {
-      for (const [type, path] of Object.entries(SOUND_PATHS)) {
-        try {
-          const response = await fetch(path, { method: 'HEAD' });
-          if (!response.ok) {
-            console.error(`Sound file not found: ${type} (${path})`);
-          } else {
-            console.log(`Sound file exists: ${type} (${path})`);
-          }
-        } catch (err) {
-          console.error(`Error checking sound file ${type}:`, err);
-        }
-      }
-    };
     
     checkAudioFiles();
     
@@ -183,45 +144,10 @@ export function useAudio() {
     }
     
     const sound = sounds[type];
-    if (!sound) {
-      console.warn(`Sound not loaded for type: ${type}`);
-      return;
-    }
-    
-    console.log(`Playing sound: ${type} from ${sound.src}`);
-    
-    // Reset to beginning and ensure volume is up
-    sound.currentTime = 0;
-    sound.volume = 1.0;
-    sound.muted = false;
-    
-    // Resume AudioContext if it exists and is suspended
-    if (audioContext && audioContext.state === 'suspended') {
-      audioContext.resume().catch(err => {
-        console.error("Failed to resume AudioContext:", err);
-      });
-    }
-    
-    // Play the sound with better error handling
-    try {
-      const playPromise = sound.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(e => {
-          console.error(`Error playing sound ${type}:`, e.message);
-          
-          // If there's an autoplay policy issue, show a message or UI element
-          if (e.name === 'NotAllowedError') {
-            console.warn("Autoplay policy prevented sound from playing - user interaction required");
-            
-            // Attempt to re-enable sounds
-            setSoundsEnabled(false);
-          }
-        });
-      }
-    } catch (e) {
-      console.error('Critical error playing sound:', e);
-    }
+    playAudioWithErrorHandling(sound, type, audioContext, () => {
+      // If there's an autoplay policy issue, attempt to re-enable sounds
+      setSoundsEnabled(false);
+    });
   };
 
   return {
