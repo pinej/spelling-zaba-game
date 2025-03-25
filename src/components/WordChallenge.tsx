@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useGameContext } from './GameContext';
 import { Challenge } from '../types/game';
@@ -36,7 +37,11 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer, play
     }
     
     setShowResult(true);
-    onAnswer(isCorrect);
+    
+    // Use a timeout to allow the user to see the result before proceeding
+    setTimeout(() => {
+      onAnswer(isCorrect);
+    }, 1000);
   };
   
   const isCorrectAnswer = (option: string) => {

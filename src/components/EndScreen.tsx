@@ -27,6 +27,7 @@ const EndScreen: React.FC = () => {
   };
   
   const handlePlayAgain = () => {
+    setGameStatus('playing');
     resetGame();
     
     // Navigate to the appropriate game route based on gameType
