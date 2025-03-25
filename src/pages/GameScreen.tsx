@@ -1,8 +1,9 @@
+
 import React, { useEffect } from 'react';
 import { useGameContext } from '../components/GameContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ChallengeComponent from '../components/ChallengeComponent';
 import MultiplicationChallengeComponent from '../components/MultiplicationChallengeComponent';
@@ -65,6 +66,10 @@ const GameScreen: React.FC = () => {
     goToNextChallenge();
   };
 
+  const handleReturnToSelection = () => {
+    navigate('/game-selection');
+  };
+
   if (!currentChallenge && !currentMultiplicationChallenge) {
     return <div>Ładowanie...</div>;
   }
@@ -79,7 +84,11 @@ const GameScreen: React.FC = () => {
     >
       <div className="glass-card p-8 rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center mb-6">
-          <div>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={handleReturnToSelection} className="flex items-center gap-2">
+              <Home size={18} />
+              Powrót
+            </Button>
             <Button variant="secondary" onClick={resetGame}>
               Zacznij od nowa
             </Button>
