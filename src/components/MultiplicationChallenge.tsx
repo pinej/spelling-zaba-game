@@ -6,8 +6,17 @@ import { Button } from './ui/button';
 import { Home, Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SoundToggle from './SoundToggle';
+import { MultiplicationChallenge as MultiplicationChallengeType } from '../types/game';
 
-const MultiplicationChallenge: React.FC = () => {
+interface MultiplicationChallengeProps {
+  challenge?: MultiplicationChallengeType;
+  onAnswer?: (selectedAnswer: number) => void;
+}
+
+const MultiplicationChallenge: React.FC<MultiplicationChallengeProps> = ({ 
+  challenge,
+  onAnswer: propOnAnswer
+}) => {
   const { 
     currentMultiplicationChallenge, 
     goToNextChallenge, 
@@ -20,6 +29,8 @@ const MultiplicationChallenge: React.FC = () => {
     updateStreak,
     streak
   } = useGameContext();
+  
+  const activeChallenge = challenge || currentMultiplicationChallenge;
   
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -34,35 +45,39 @@ const MultiplicationChallenge: React.FC = () => {
     // Reset state when challenge changes
     setSelectedAnswer(null);
     setShowFeedback(false);
-  }, [currentMultiplicationChallenge]);
+  }, [activeChallenge]);
   
   const handleAnswerClick = (answer: number) => {
-    if (showFeedback || !currentMultiplicationChallenge) return;
+    if (showFeedback || !activeChallenge) return;
     
     setSelectedAnswer(answer);
     
-    const correct = answer === currentMultiplicationChallenge.correctAnswer;
+    const correct = answer === activeChallenge.correctAnswer;
     setIsCorrect(correct);
     
-    if (correct) {
-      incrementScore();
-      playSound('correct');
-      updateStreak(true);
+    if (propOnAnswer) {
+      propOnAnswer(answer);
     } else {
-      playSound('incorrect');
-      addIncorrectMultiplicationAnswer(currentMultiplicationChallenge);
-      updateStreak(false);
+      if (correct) {
+        incrementScore();
+        playSound('correct');
+        updateStreak(true);
+      } else {
+        playSound('incorrect');
+        addIncorrectMultiplicationAnswer(activeChallenge);
+        updateStreak(false);
+      }
+      
+      setShowFeedback(true);
+      
+      // Proceed to next challenge after a delay
+      setTimeout(() => {
+        goToNextChallenge();
+      }, streak.showCongratulations ? 3000 : 1500);
     }
-    
-    setShowFeedback(true);
-    
-    // Proceed to next challenge after a delay
-    setTimeout(() => {
-      goToNextChallenge();
-    }, streak.showCongratulations ? 3000 : 1500);
   };
   
-  if (!currentMultiplicationChallenge) return null;
+  if (!activeChallenge) return null;
   
   return (
     <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
@@ -95,18 +110,18 @@ const MultiplicationChallenge: React.FC = () => {
         </h2>
         
         <div className="text-4xl md:text-5xl font-bold my-6 text-primary">
-          {currentMultiplicationChallenge.firstNumber} × {currentMultiplicationChallenge.secondNumber} = ?
+          {activeChallenge.firstNumber} × {activeChallenge.secondNumber} = ?
         </div>
         
         <div className="grid grid-cols-2 gap-3 mt-6">
-          {currentMultiplicationChallenge.options.map((option, index) => (
+          {activeChallenge.options.map((option, index) => (
             <motion.button
               key={index}
               className={`
                 py-3 px-4 md:py-4 md:px-6 text-xl md:text-2xl rounded-lg button-hover
                 ${selectedAnswer === option && isCorrect ? 'bg-success/20 text-success border-success/50 border-2' : ''}
                 ${selectedAnswer === option && !isCorrect ? 'bg-destructive/20 text-destructive border-destructive/50 border-2' : ''}
-                ${selectedAnswer !== option && option === currentMultiplicationChallenge.correctAnswer && showFeedback ? 'bg-success/10 text-success border-success/50 border-2' : ''}
+                ${selectedAnswer !== option && option === activeChallenge.correctAnswer && showFeedback ? 'bg-success/10 text-success border-success/50 border-2' : ''}
                 ${!selectedAnswer ? 'bg-white border-2 border-primary/50 shadow-sm hover:shadow-md hover:border-primary' : ''}
               `}
               onClick={() => handleAnswerClick(option)}
@@ -120,10 +135,11 @@ const MultiplicationChallenge: React.FC = () => {
         </div>
       </motion.div>
       
+      {/* Move streak congratulations below the game card */}
       <AnimatePresence>
         {streak.showCongratulations && (
           <motion.div
-            className="bg-accent/20 p-6 rounded-lg text-center my-4"
+            className="bg-accent/20 p-6 rounded-lg text-center my-4 w-full"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}

@@ -119,36 +119,8 @@ const GameScreen: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {incorrectAnswers.length > 0 && (
-        <div className="mt-6 w-full max-w-2xl">
-          <h3 className="text-lg font-semibold text-red-600 mb-2">
-            Błędne odpowiedzi:
-          </h3>
-          <ul>
-            {incorrectAnswers.map((incorrect, index) => (
-              <li key={index} className="text-red-500">
-                {incorrect.word} - Poprawna odpowiedź: {incorrect.correctOption}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {incorrectMultiplicationAnswers.length > 0 && (
-        <div className="mt-6 w-full max-w-2xl">
-          <h3 className="text-lg font-semibold text-red-600 mb-2">
-            Błędne odpowiedzi z mnożenia:
-          </h3>
-          <ul>
-            {incorrectMultiplicationAnswers.map((incorrect, index) => (
-              <li key={index} className="text-red-500">
-                {incorrect.firstNumber} x {incorrect.secondNumber} - Poprawna odpowiedź: {incorrect.correctAnswer}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      
+      {/* Remove the incorrect answers display - they'll only be shown at the end screen */}
     </motion.div>
   );
 };

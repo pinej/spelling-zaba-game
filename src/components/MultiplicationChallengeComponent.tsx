@@ -13,7 +13,10 @@ const MultiplicationChallengeComponent: React.FC<MultiplicationChallengeComponen
   onAnswer 
 }) => {
   return (
-    <MultiplicationChallengeUI />
+    <MultiplicationChallengeUI 
+      challenge={challenge}
+      onAnswer={onAnswer}
+    />
   );
 };
 
