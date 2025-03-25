@@ -26,7 +26,8 @@ const GameScreen: React.FC = () => {
     addIncorrectMultiplicationAnswer,
     playSound,
     updateStreak,
-    streak
+    streak,
+    playerName
   } = useGameContext();
   const navigate = useNavigate();
 
@@ -77,21 +78,6 @@ const GameScreen: React.FC = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {streak.showCongratulations && (
-        <motion.div
-          className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-primary/20 z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="text-center">
-            <Sparkles className="h-12 w-12 text-yellow-500 mx-auto" />
-            <h2 className="text-2xl font-bold text-primary-foreground mb-2">{streak.congratulationMessage}</h2>
-          </div>
-        </motion.div>
-      )}
-
       <div className="glass-card p-8 rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -120,7 +106,24 @@ const GameScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Remove the incorrect answers display - they'll only be shown at the end screen */}
+      {/* Streak congratulations message appears below the game card */}
+      {streak.showCongratulations && (
+        <motion.div
+          className="mt-6 bg-accent/20 p-6 rounded-lg text-center w-full max-w-2xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-center">
+            <Sparkles className="h-12 w-12 text-yellow-500 mx-auto" />
+            <h2 className="text-2xl font-bold text-primary-foreground mb-2">{streak.congratulationMessage}</h2>
+            <p className="text-muted-foreground">
+              Masz już {streak.currentStreak} poprawnych odpowiedzi z rzędu!
+            </p>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
