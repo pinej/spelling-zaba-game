@@ -55,7 +55,7 @@ const GameSelection: React.FC = () => {
           className="mb-10 text-center"
         >
           <h1 className="text-3xl font-bold text-primary mb-2">
-            Cześć, {playerName ? playerName : 'Uczniu'}!
+            Cześć, {playerName || "Uczniu"}!
           </h1>
           <p className="text-xl text-muted-foreground">
             Wybierz w co chcesz dzisiaj zagrać
