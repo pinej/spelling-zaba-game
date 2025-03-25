@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameContext } from './GameContext';
 import { Button } from './ui/button';
-import { Home, Calculator } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SoundToggle from './SoundToggle';
 import { MultiplicationChallenge as MultiplicationChallengeType } from '../types/game';
@@ -36,10 +36,6 @@ const MultiplicationChallenge: React.FC<MultiplicationChallengeProps> = ({
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const navigate = useNavigate();
-  
-  const handleReturnToHome = () => {
-    navigate('/game-selection');
-  };
   
   useEffect(() => {
     // Reset state when challenge changes
@@ -82,15 +78,6 @@ const MultiplicationChallenge: React.FC<MultiplicationChallengeProps> = ({
   return (
     <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
       <div className="w-full flex items-center justify-between mb-6">
-        <Button
-          variant="ghost"
-          className="flex items-center gap-2"
-          onClick={handleReturnToHome}
-        >
-          <Home size={16} />
-          Powrót
-        </Button>
-        
         <SoundToggle />
         
         <div className="flex items-center gap-2 text-muted-foreground">
