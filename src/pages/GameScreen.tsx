@@ -1,8 +1,9 @@
+
 import React, { useEffect } from 'react';
 import { useGameContext } from '../components/GameContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Confetti } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ChallengeComponent from '../components/ChallengeComponent';
 import MultiplicationChallengeComponent from '../components/MultiplicationChallengeComponent';
@@ -39,7 +40,7 @@ const GameScreen: React.FC = () => {
     let isCorrect = false;
 
     if (gameType === 'spelling' && currentChallenge) {
-      isCorrect = selectedAnswer === currentChallenge.correctAnswer;
+      isCorrect = selectedAnswer === currentChallenge.correctOption;
 
       if (isCorrect) {
         incrementScore();
@@ -85,7 +86,7 @@ const GameScreen: React.FC = () => {
           transition={{ duration: 0.3 }}
         >
           <div className="text-center">
-            <Confetti className="h-12 w-12 text-yellow-500 mx-auto" />
+            <Sparkles className="h-12 w-12 text-yellow-500 mx-auto" />
             <h2 className="text-2xl font-bold text-primary-foreground mb-2">{streak.congratulationMessage}</h2>
           </div>
         </motion.div>
@@ -127,7 +128,7 @@ const GameScreen: React.FC = () => {
           <ul>
             {incorrectAnswers.map((incorrect, index) => (
               <li key={index} className="text-red-500">
-                {incorrect.word} - Poprawna odpowiedź: {incorrect.correctAnswer}
+                {incorrect.word} - Poprawna odpowiedź: {incorrect.correctOption}
               </li>
             ))}
           </ul>
@@ -142,7 +143,7 @@ const GameScreen: React.FC = () => {
           <ul>
             {incorrectMultiplicationAnswers.map((incorrect, index) => (
               <li key={index} className="text-red-500">
-                {incorrect.num1} x {incorrect.num2} - Poprawna odpowiedź: {incorrect.correctAnswer}
+                {incorrect.firstNumber} x {incorrect.secondNumber} - Poprawna odpowiedź: {incorrect.correctAnswer}
               </li>
             ))}
           </ul>
