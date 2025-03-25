@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Button } from './ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const EndScreen: React.FC = () => {
   const { 
@@ -18,13 +19,16 @@ const EndScreen: React.FC = () => {
     gameType
   } = useGameContext();
   
+  const navigate = useNavigate();
+  
   const handleReturnToHome = () => {
     setGameStatus('start');
-    window.location.href = '/';
+    navigate('/');
   };
   
   const handlePlayAgain = () => {
     resetGame();
+    setGameStatus('playing');
   };
   
   // Calculate percentage score

@@ -1,4 +1,3 @@
-
 import { MultiplicationChallenge } from '../types/game';
 
 // Generate random number between min and max (inclusive)
@@ -19,21 +18,25 @@ const createMultiplicationChallenge = (id: number): MultiplicationChallenge => {
   }
   
   // Generate 3 wrong answers that are close to the correct answer
-  const wrongAnswers: number[] = [];
-  while (wrongAnswers.length < 3) {
+  const generatedWrongAnswers = new Set<number>();
+  
+  // Keep trying until we have 3 unique wrong answers
+  while (generatedWrongAnswers.size < 3) {
     // Generate a wrong answer within ±5 of the correct answer, but not equal to it
     let wrongAnswer = correctAnswer + getRandomInt(-5, 5);
     
     // Ensure the wrong answer is positive and not equal to the correct answer
-    // and not already in the wrong answers array
     if (
       wrongAnswer > 0 && 
       wrongAnswer !== correctAnswer && 
-      !wrongAnswers.includes(wrongAnswer)
+      !generatedWrongAnswers.has(wrongAnswer)
     ) {
-      wrongAnswers.push(wrongAnswer);
+      generatedWrongAnswers.add(wrongAnswer);
     }
   }
+  
+  // Convert Set to Array
+  const wrongAnswers = Array.from(generatedWrongAnswers);
   
   // Combine correct and wrong answers, then shuffle
   const options = [correctAnswer, ...wrongAnswers];
