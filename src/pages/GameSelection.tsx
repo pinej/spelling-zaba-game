@@ -25,7 +25,7 @@ const GameSelection: React.FC = () => {
   };
 
   const handleReturnToHome = () => {
-    navigate('/'); // Changed to navigate to the main screen
+    navigate('/'); // Navigate to the main screen
   };
 
   return (
