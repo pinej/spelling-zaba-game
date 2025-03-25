@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useGameContext } from '../components/GameContext';
 import StartScreen from '../components/StartScreen';
-import GameScreen from '../components/GameScreen';
+import GamePlayScreen from '../components/GamePlayScreen';
 import EndScreen from '../components/EndScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -48,7 +48,7 @@ const Index: React.FC = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <GameScreen />
+            <GamePlayScreen />
           </motion.div>
         )}
         
