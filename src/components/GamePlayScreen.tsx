@@ -80,7 +80,7 @@ const GamePlayScreen: React.FC = () => {
         {gameType === 'multiplication' && currentMultiplicationChallenge && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-4 text-center">
-              {currentMultiplicationChallenge.firstFactor} × {currentMultiplicationChallenge.secondFactor} = ?
+              {currentMultiplicationChallenge.firstNumber} × {currentMultiplicationChallenge.secondNumber} = ?
             </h2>
             <div className="grid grid-cols-2 gap-4">
               {currentMultiplicationChallenge.options.map((option, index) => (
