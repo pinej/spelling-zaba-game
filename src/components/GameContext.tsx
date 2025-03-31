@@ -1,37 +1,28 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useGameState } from '../hooks/useGameState';
-import { GameStatus, Challenge, GameType, MultiplicationChallenge, StreakInfo } from '../types/game';
+import { GameStatus, Challenge } from '../types/game';
 
 type GameContextType = {
   gameStatus: GameStatus;
-  gameType: GameType;
   setGameStatus: (status: GameStatus) => void;
-  setGameType: (type: GameType) => void;
   score: number;
   incrementScore: () => void;
   currentRound: number;
   challenges: Challenge[];
-  multiplicationChallenges: MultiplicationChallenge[];
   currentChallenge: Challenge | null;
-  currentMultiplicationChallenge: MultiplicationChallenge | null;
   totalRounds: number;
   resetGame: () => void;
   goToNextChallenge: () => void;
   playSound: (type: 'correct' | 'incorrect' | 'start' | 'end') => void;
   incorrectAnswers: Challenge[];
-  incorrectMultiplicationAnswers: MultiplicationChallenge[];
   addIncorrectAnswer: (challenge: Challenge) => void;
-  addIncorrectMultiplicationAnswer: (challenge: MultiplicationChallenge) => void;
   soundsEnabled: boolean;
   enableSounds: () => void;
   isMuted: boolean;
   toggleMute: () => void;
   playerName: string;
   setPlayerName: (name: string) => void;
-  streak: StreakInfo;
-  updateStreak: (correct: boolean) => void;
-  resetStreak: () => void;
 };
 
 const GameContext = createContext<GameContextType | null>(null);

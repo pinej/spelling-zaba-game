@@ -1,24 +1,18 @@
+
 import React, { useState } from 'react';
 import { useGameContext } from './GameContext';
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Volume2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import SoundToggle from './SoundToggle';
-import { useNavigate } from 'react-router-dom';
 
 const StartScreen: React.FC = () => {
-  const { setPlayerName, playerName, playSound } = useGameContext();
+  const { resetGame, soundsEnabled, enableSounds, setPlayerName, playerName } = useGameContext();
   const [nameInput, setNameInput] = useState(playerName || '');
-  const navigate = useNavigate();
   
-  const handleContinue = () => {
-    // Save the player name to context
+  const handleStartGame = () => {
     setPlayerName(nameInput.trim());
-    // Play sound only when clicking DALEJ button
-    playSound('start');
-    // Navigate using React Router instead of window.location
-    navigate('/game-selection');
+    resetGame();
   };
   
   return (
@@ -34,10 +28,6 @@ const StartScreen: React.FC = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <div className="w-full flex justify-end mb-4">
-          <SoundToggle />
-        </div>
-        
         <motion.div
           className="flex items-center justify-center mb-4"
           initial={{ scale: 0.9, opacity: 0 }}
@@ -49,13 +39,31 @@ const StartScreen: React.FC = () => {
         </motion.div>
         
         <motion.h1 
-          className="text-3xl md:text-4xl font-bold mb-6 text-primary-foreground"
+          className="text-3xl md:text-4xl font-bold mb-2 text-primary-foreground"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Gram i uczę się
+          Helenki Polska Ortografia
         </motion.h1>
+        
+        <motion.div 
+          className="text-xl text-primary mb-6"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          Nauka trudnych liter
+        </motion.div>
+        
+        <motion.p 
+          className="mb-6 text-muted-foreground"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
+          Wybierz poprawną literę w każdym słowie i zdobądź punkty!
+        </motion.p>
         
         <motion.div
           className="w-full max-w-xs mb-6"
@@ -73,16 +81,35 @@ const StartScreen: React.FC = () => {
           />
         </motion.div>
         
+        {!soundsEnabled && (
+          <motion.div
+            className="mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0, duration: 0.5 }}
+          >
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={enableSounds}
+              className="flex items-center gap-2 mb-4"
+            >
+              <Volume2 size={16} />
+              Włącz dźwięki
+            </Button>
+          </motion.div>
+        )}
+        
         <motion.button
           className="bg-primary text-primary-foreground text-lg md:text-xl px-10 py-4 rounded-full shadow-lg button-hover animate-pulse-scale"
-          onClick={handleContinue}
+          onClick={handleStartGame}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.1, duration: 0.5 }}
         >
-          DALEJ
+          START
         </motion.button>
       </motion.div>
     </motion.div>

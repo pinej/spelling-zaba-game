@@ -7,10 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 type WordChallengeProps = {
   challenge: Challenge;
   onAnswer: (isCorrect: boolean) => void;
-  playerName?: string;
 };
 
-const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer, playerName }) => {
+const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const { playSound, addIncorrectAnswer } = useGameContext();
@@ -37,11 +36,7 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer, play
     }
     
     setShowResult(true);
-    
-    // Use a timeout to allow the user to see the result before proceeding
-    setTimeout(() => {
-      onAnswer(isCorrect);
-    }, 1000);
+    onAnswer(isCorrect);
   };
   
   const isCorrectAnswer = (option: string) => {
@@ -68,7 +63,7 @@ const WordChallenge: React.FC<WordChallengeProps> = ({ challenge, onAnswer, play
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          {playerName ? `${playerName}, wybierz brakującą literę:` : 'Wybierz brakującą literę:'}
+          Wybierz brakującą literę:
         </motion.div>
         
         <motion.div 

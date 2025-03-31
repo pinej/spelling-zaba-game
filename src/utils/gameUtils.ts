@@ -1,7 +1,7 @@
 import { Challenge } from '../types/game';
 
 // The text with vocabulary
-const TEXT = "Żaba mówi żartem, że zostawiła nad rzeką auto. Żuk, który lubi kałuże ma też parasol w żółte róże. Jeż leży na świeżym powiet... u. Zwierzęta oglądają pejzaż. Zastała ich bardzo duża burza.";
+const TEXT = "Żaba mówi żartem, że zostawiła nad rzeką auto. Żuk, który lubi kałuże ma też parasol w żółte róże. Jeż leży na świeżym powietru. Zwierzęta oglądają pejzaż. Zastała ich bardzo duża burza.";
 
 // Extract words from text
 const extractWords = (): string[] => {

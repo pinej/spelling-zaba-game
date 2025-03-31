@@ -1,8 +1,8 @@
 
 import React, { useEffect } from 'react';
-import { useGameContext } from '../components/GameContext';
+import { GameProvider, useGameContext } from '../components/GameContext';
 import StartScreen from '../components/StartScreen';
-import GamePlayScreen from '../components/GamePlayScreen';
+import GameScreen from '../components/GameScreen';
 import EndScreen from '../components/EndScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,7 +14,7 @@ const soundFiles = [
   '/end.wav'
 ];
 
-const Index: React.FC = () => {
+const GameContent: React.FC = () => {
   const { gameStatus } = useGameContext();
   
   // Preload game sounds
@@ -26,44 +26,52 @@ const Index: React.FC = () => {
   }, []);
   
   return (
+    <AnimatePresence mode="wait">
+      {gameStatus === 'start' && (
+        <motion.div 
+          key="start"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <StartScreen />
+        </motion.div>
+      )}
+      
+      {gameStatus === 'playing' && (
+        <motion.div 
+          key="playing"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <GameScreen />
+        </motion.div>
+      )}
+      
+      {gameStatus === 'end' && (
+        <motion.div 
+          key="end"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <EndScreen />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const Index: React.FC = () => {
+  return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <AnimatePresence mode="wait">
-        {gameStatus === 'start' && (
-          <motion.div 
-            key="start"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <StartScreen />
-          </motion.div>
-        )}
-        
-        {gameStatus === 'playing' && (
-          <motion.div 
-            key="playing"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <GamePlayScreen />
-          </motion.div>
-        )}
-        
-        {gameStatus === 'end' && (
-          <motion.div 
-            key="end"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <EndScreen />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <GameProvider>
+        <GameContent />
+      </GameProvider>
     </div>
   );
 };
